@@ -39,14 +39,14 @@ ngerman
 	
 % Hier die persönlichen Daten eingeben:
 
-\newcommand{\titel}{Titel der Projekt- / Studien- / Haus- oder Bachelorarbeit}
+\newcommand{\titel}{Dokumentation zum Bau eines High-Speed Bierkühlers}
 \newcommand{\untertitel}{}	% ggf. Untertitel mit ergänzenden Hinweisen
-\newcommand{\arbeit}{Projektarbeit T4\lowrule 1000 / Projektarbeit T4\lowrule 2000 / Studienarbeit T4\lowrule 3100 / Hausarbeit T4\lowrule 3000 / Studienarbeit T4\lowrule 3200 / Bachelorarbeit T4\lowrule 3300}
+\newcommand{\arbeit}{Projektarbeit Mikrocomputertechnik}
 \newcommand{\studiengang}{Elektrotechnik und Informationstechnik}
 \newcommand{\studienrichtung}{Fahrzeugelektronik}
 \newcommand{\studienschwerpunkt}{}
-\newcommand{\autor}{Autorin / Autor}
-\newcommand{\bearbeitungszeitraum}{01.01.2025 - 31.03.2025}
+\newcommand{\autor}{Ferdinand Leybach, Maurice Manz, Yannick Schmidt, Simon Straub}
+\newcommand{\bearbeitungszeitraum}{22.10.2025 - 13.03.2026}
 \newcommand{\matrikelnr}{1234567}
 \newcommand{\kurs}{TFE24-2}
 \newcommand{\firma}{Name des Dualen Partners (entfällt ggf. bei Studienarbeit)}
@@ -219,7 +219,7 @@ acronym,
 \include{pages/titelseite} 				% erzeugt die Titelseite
 \pagenumbering{roman}					% kleine, römische Seitenzahlen für Titelei
 \include{pages/erklaerung} 				% Einbinden der eidestattlichen Erklärung
-\include{chapter/abstract}   			% Einbinden des Abstracts
+
 
 \tableofcontents						% Erzeugen des Inhalsverzeichnisses
 
@@ -238,8 +238,11 @@ acronym,
 
 \include{chapter/einleitung}
 \include{chapter/grundlagen}
-\include{chapter/vorgehen}
-\include{chapter/umsetzung}
+\include{chapter/schaltplan}
+\include{chapter/konstruktion}
+\include{chapter/software}
+\include{chapter/lessons_learned}
+\include{chapter/tests}
 \include{chapter/zusammenfassung}
 
 % ---- Literaturverzeichnis ----------

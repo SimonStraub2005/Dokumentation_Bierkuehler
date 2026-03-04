@@ -1,8 +1,17 @@
-\chapter{Umsetzung und Ergebnisse}
-\label{cha:umsetzung}
+\chapter{Lessons Learned}
 
-Je nach Art der Arbeit kann diese Kapitelüberschrift auch \glqq Ergebnisse\grqq~lauten, z.~B. bei rein messtechnischen Aufgaben.
+Jedes mechatronische Entwicklungsprojekt ist einem iterativen Prozess unterworfen, bei dem theoretische Planungen in der praktischen Umsetzung unweigerlich auf reale physikalische und technische Herausforderungen treffen. Die Entwicklung, Konstruktion und Inbetriebnahme des Bierkühlers bildeten hierbei keine Ausnahme. Im Verlauf des Projekts zeigte sich immer wieder, dass insbesondere das komplexe Zusammenspiel aus Mechanik, Fluidtechnik und Elektronik spontane Anpassungen und kreative Problemlösungen erforderte, um einen funktionsfähigen Prototyp zu realisieren.
 
-Beschreibung der Umsetzung des zuvor gewählten Vorgehens (theoretische Untersuchung, Erhebungen, Durchführung von Experimenten, Prototypenaufbau, Implementierung eines Prozesses, etc.).
+In diesem Kapitel werden die zentralen technischen, methodischen und konzeptionellen Erkenntnisse zusammengefasst, die während der Projektlaufzeit gesammelt wurden. Diese rückblickende Betrachtung dient nicht nur der transparenten Dokumentation aufgetretener Hindernisse und deren Lösungsansätzen, sondern soll auch als fundierte Wissensgrundlage für zukünftige Hardware-Revisionen oder ähnlich gelagerte Microcomputer-Projekte dienen. Die folgenden Abschnitte beleuchten die wichtigsten Erfahrungen, die während der Konstruktions-, Fertigungs- und Testphase gewonnen werden konnten.
 
-Verifikation anhand der zuvor erarbeiteten Anforderungen und Validierung in Bezug auf das zuvor gestellte Ziel. Diskussion der Ergebnisse. Spätestens hier auch auf die Zuverlässigkeit der gewonnenen Erkenntnisse eingehen (z.~B. anhand der Genauigkeit von Messergebnissen).
+\section{Mechanischer Aufbau und Design}
+
+Im Verlauf der Entwicklung und Fertigung konnten wichtige technische Erkenntnisse gewonnen werden, die für zukünftige Projekte im Bereich der Mechatronik und Microcomputertechnik von Bedeutung sind:
+
+\begin{itemize}
+	\item \textbf{Materialeigenschaften und Dichtigkeit:} Die Annahme, dass 3D-Druckteile von Natur aus wasserdicht sind, bestätigte sich nicht unmittelbar. Die Erfahrung zeigte, dass nicht nur die Materialwahl (PLA vs. PETG), sondern primär die Wandstärke und die Anzahl der Perimeter (Außenlinien) im Slicer entscheidend für die hydrostatische Dichtigkeit sind.
+	\item \textbf{Reibung und Kraftübertragung:} Die anfängliche Problematik der durchdrehenden Wellen verdeutlichte, dass bei glatten Oberflächen (Kunststoff auf Glas) im Nassbereich die mechanische Reibung oft überschätzt wird. Die Integration von Gummidichtungsringen als Haftvermittler stellte eine einfache, aber effektive mechanische Lösung dar.
+	\item \textbf{Getriebeübersetzung vs. Softwaresteuerung:} Die Anpassung der Drehzahl zeigte den klassischen Zielkonflikt zwischen Mechanik und Elektronik. Während eine mechanische Reduktion (Verkleinerung des Wellendurchmessers) das Drehmoment unberührt lässt, bietet die Ansteuerung via PWM eine höhere Flexibilität, erfordert jedoch eine robustere mechanische Kopplung (Sicherung der Motorwelle), um die auftretenden Kräfte dauerhaft zu übertragen.
+	\item \textbf{Montagefreundlichkeit:} Das Einbringen von Einschmelzgewinden (M3) hat sich gegenüber dem direkten Verschrauben in Kunststoff als deutlich überlegen erwiesen, da es mehrfache Demontagen zu Wartungszwecken erlaubt, ohne das Material zu verschleißen.
+	\item \textbf{Schnittstellenmanagement:} Die größte Herausforderung lag nicht in den Einzelkomponenten, sondern in deren Zusammenspiel. Die passgenaue Ausrichtung des Motors zur Welle („Balkon-Konstruktion“) erforderte präzise Toleranzrechnungen, die bereits in der CAD-Phase stärker hätten berücksichtigt werden müssen.
+\end{itemize}

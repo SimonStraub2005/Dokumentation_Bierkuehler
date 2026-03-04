@@ -1,25 +1,30 @@
 \chapter{Einleitung}
 \label{cha:Einleitung}
 
-Folgende Stichworte können zum Aufbau der Einleitung herangezogen werden.
 
-\begin{itemize}
-\item Hinführung, Begründung, Zweck und Ziel der Aufgabenstellung
-\item Erläuterung der Problemstellung
-\item Konkretisierung der zu lösenden Aufgabe
-\item Gegebenenfalls Formulierung einer Leitfrage oder Forschungsfrage
-\item Ausgangslage, geplante Vorgehensweise, Methoden zur Bearbeitung und Zielsituation
-\item Zum Ende der Einleitung wird eine Kurzübersicht über die Inhalte der Kapitel gegeben: \glqq Die Arbeit ist wie folgt gegliedert: ...\grqq
-\end{itemize}
 
-Die Einleitung wird üblicherweise auf ein bis zwei Seiten als fortlaufender Text geschrieben. Eine weitere Untergliederung in nummerierte Abschnitte ist nicht empfehlenswert, da dies erstens unüblich ist, zweitens die Lesbarkeit nicht begünstigt und drittens die Formulierung der Einleitung erschwert. Weitere Empfehlungen zum Aufbau der Einleitung und des gesamten Dokuments sind z.~B. aus \autocite{DHBW.2021} und \autocite{Lindenlauf.2022} zu entnehmen.
+Die schnelle und effiziente Kühlung von Getränken spielt sowohl im privaten als auch im professionellen Umfeld eine wichtige Rolle. Insbesondere bei Bier ist die richtige Trinktemperatur entscheidend für Geschmack, Frischeeindruck und Genussqualität. Herkömmliche Methoden – wie das Einstellen der Flasche oder Dose in einen Kühlschrank oder das Eintauchen in kaltes Wasser – sind zwar einfach umzusetzen, jedoch häufig zeitintensiv. Ziel unseres Projekts war es daher, einen kompakten, technisch innovativen Bierkühler zu entwickeln, der die Kühlzeit deutlich reduziert und dabei mit überschaubarem technischen Aufwand realisierbar ist.
 
-\clearpage
+Die zentrale Idee unseres Systems basiert auf einem physikalischen Grundprinzip der Wärmeübertragung: Beim Abkühlen eines ruhenden Getränks bildet sich an der Innenseite der Flasche eine isolierende Grenzschicht aus bereits abgekühlter Flüssigkeit. Diese Schicht wirkt wie eine thermische Barriere und verlangsamt den weiteren Wärmeaustausch zwischen dem wärmeren Getränkekern und der kalten Umgebung. Unser Bierkühler verhindert die Ausbildung dieser isolierenden Schicht, indem das Bier kontinuierlich in Rotation versetzt wird. Durch die stetige Durchmischung wird die Temperatur im Inneren ausgeglichen, wodurch die Wärme effizienter nach außen abgeführt werden kann. Es handelt sich also um den effizientesten Weg Bier in möglichst geringer Zeit zu kühlen.
 
-Hinweise: 
+Technisch wird dieses Prinzip durch das Zusammenspiel mehrerer Komponenten umgesetzt. Als Herzstück wird unser Mikrocontroller verwendet, der neben der Steuerung von der Pumpe und des Motors auch den Temperatursensor an ein Display weitergibt. Die Pumpe pumpt das Wasser vom unteren des 3D Druck Behälters durch einen Wasserschlauch nach oben, damit das Wasser von oben auf die zu kühlende Flasche tropft. Der Motor betreibt die Rotation der Flasche, indem er eine Welle, welche in das 3D Druck Gehäuse integriert ist, antreibt. Um all die Komponenten im Überblick zu haben wird ein Display verwendet, welches die Temperatur anzeigt. Durch einen Druckknopf kann der Bierkühler angehalten beziehungsweise wieder gestartet werden.  In Kombination all dieser Komponenten entsteht so ein deutlich beschleunigter Wärmeübergang zwischen dem noch warmen Bier und dem Kühlwasser.
 
-\begin{itemize}
-\item Auch in der Einleitung unbedingt zu wichtigen Hintergründen und Fakten Zitate aufführen.\index{Zitat} Zitate bitte in der Form \autocite{Tipler.2019} oder mit Seitenbezug \autocite[66]{Ziegler.2017} oder auch mehrere Zitate  \autocite{Tipler.2019, Ziegler.2017} innerhalb einer eckigen Klammer angeben. Zur besseren Lesbarkeit bitte immer ein Leerzeichen vor dem Zitat einfügen.
-	
-\item Bereits in der Einleitung können Abkürzungen erläutert werden. Grundsätzlich gilt, dass bei der ersten Verwendung einer Abkürzung diese auch erläutert wird. Zum Beispiel können das \acrlong{acr:ABS}  (\acrshort{acr:ABS}) oder die Fahrdynamikregelung (\acrlong{acr:ESC}, \acrshort{acr:ESC}) als Abkürzungen eingeführt werden. In der Datei \textit{pages/abkuerzungen.tex} sind alle verwendeten Abkürzungen einzufügen. Neben dem verpflichtenden Abkürzungsverzeichnis kann auch ein Glossar hinzugefügt werden. In dieser Vorlage können Glossareinträge in der Datei \textit{pages/glossar.tex} eingefügt werden. Ein \Gls{gls:glossar} ist jedoch nicht verpflichtend.
-\end{itemize}
+Besonderer Wert wurde bei der Entwicklung auf eine kompakte Bauweise, eine klare Struktur der elektronischen Steuerung sowie eine stabile mechanische Umsetzung gelegt. Das 3D-gedruckte Gehäuse ermöglicht eine passgenaue Integration aller Komponenten und bietet gleichzeitig Schutz vor Feuchtigkeit und mechanischen Einwirkungen. Die modulare Bauweise erleichtert zudem Wartung, Anpassung und Weiterentwicklung des Systems. Außerdem ist unser Ziel das Bier nicht durch zu schnelle Drehung zu stark zum schäumen zu bringen, weshalb wir auf PBM setzen, um die richtige Drehgeschwindigkeit zu bekommen. 
+
+Diese Dokumentation beschreibt die Konzeption, Konstruktion und Funktionsweise des Bierkühlers im Detail. Neben den physikalischen Grundlagen werden die mechanische Konstruktion, die elektronische Steuerung, die Programmierung des Mikrocontrollers sowie mögliche Optimierungsansätze erläutert. Um in diesen vielen verschiedenen Projektteilen gut aufgestellt zu sein, haben wir für die verschiedenen Punkte jeweils einen Abteilungschef bestimmt, welcher die jeweilige Abteilung im Auge behält und sich auch hauptsächlich darum kümmert. In diesem Fall sah die Aufteilung wie folgt aus:
+
+\begin{tabular}{lll}
+	\toprule
+	\textbf{Name} & \textbf{Abteilung 1} & \textbf{Abteilung 2} \\
+	\midrule
+	Maurice Manz & mechanische Konstruktion & elektronische Steuerung \\
+	Ferdinand Leybach & Softwareentwicklung & Bauteilbeschaffung \\
+	Yannick Schmitt & Test und Qualifikation & \\
+	Simon Straub & Projektmanagement & \\
+	\bottomrule
+\end{tabular}
+
+
+
+
+ Ziel ist es, die technische Umsetzung nachvollziehbar darzustellen und die zugrunde liegenden Überlegungen transparent zu machen. Es wird durchaus die Absicht verfolgt nach der Entwicklung des ersten Prototypen auch mehrere dieser Bierkühler zu bauen, sodass einige Leute von unserer Idee profitieren können. Dabei muss natürlich auf auf den Preis geschaut werden, sodass es sich nicht um zu teure Lösungen für kühles Bier handelt.

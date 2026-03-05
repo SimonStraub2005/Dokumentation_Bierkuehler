@@ -1,0 +1,91 @@
+% ==========================================
+% KAPITEL 1: Requirements Engineering
+% ==========================================
+\chapter{Requirements Engineering}
+% Hinweis: Laut Absprache kurz halten (max. 1 Seite).
+% Hier zeigst du, wie ihr das Projekt durch die Phase des Requirements Engineering gebracht habt[cite: 22].
+
+\section{Hardware- und Softwareanforderungen}
+% Hier eine kurze Tabelle oder Liste der ca. 7 Requirements (z.B. REQ-1: Zwei Temperaturen messen, REQ-2: PWM-Steuerung für Pumpe).
+
+\section{Reflexion zur Anforderungsanalyse}
+% Ein kurzer Absatz, warum im Rahmen des Wasserfallmodells und der Projektgröße die Anforderungen pragmatisch gehalten wurden.
+
+
+% ==========================================
+% KAPITEL 2: Systemarchitektur und Hardware-Design
+% ==========================================
+\chapter{Systemarchitektur und Hardware-Design}
+% Hier die Systemarchitektur beschreiben[cite: 197].
+
+\section{Gesamtarchitektur}
+% Platz für dein angepasstes PlantUML-Diagramm.
+% \begin{figure}[h]
+	%     \centering
+	%     \includegraphics[width=0.8\textwidth]{bilder/architektur.png}
+	%     \caption{Systemarchitektur des Bierkühlers}
+	% \end{figure}
+
+\section{Wahl des Mikrocontrollers und Spannungsversorgung}
+% Warum der STM32? Erklärung der 3,3V / 12V Versorgungskomponenten.
+
+\section{Sensorik (Eingabe)}
+% Beschreibung der beiden Thermometer und deren Anbindung über den ADC.
+
+\section{Aktorik (Ausgabe) und Technical Trades}
+% Technical Trades[cite: 93].
+% SEHR WICHTIG: Hier erklären, warum das Relais durch PWM-Module für Pumpe und Motor ersetzt wurde (z.B. stufenlose Regelung).
+
+\section{User Interface}
+% Anbindung und Ansteuerung des Displays über I²C.
+
+
+% ==========================================
+% KAPITEL 3: Software-Design und Implementierung
+% ==========================================
+\chapter{Software-Design und Implementierung}
+% Hier die Softwarearchitektur beschreiben[cite: 201].
+
+\section{Software-Architektur und Main-Loop}
+% Flussdiagramm eurer Software. Beschreibung, dass es sich um ein "MCT optimiertes Design" handelt.
+
+\section{Peripherie-Setup und Treiber}
+\subsection{I²C-Kommunikation (Display)}
+\subsection{PWM-Generierung (Motor und Pumpe)}
+\subsection{ADC-Konfiguration (Temperatursensoren)}
+
+\section{Code-Qualität und Dokumentation}
+% Verweis auf "Applicable Standards and Rules (Coding Rules)"[cite: 206].
+% Kurzes Beispiel zeigen, wie ihr Doxygen für die Code-Dokumentation genutzt habt[cite: 170, 248].
+
+
+% ==========================================
+% KAPITEL 4: Test und Validierung
+% ==========================================
+\chapter{Test und Validierung}
+% Test Specification and Report[cite: 190].
+
+\section{Testfälle (Test Cases)}
+% Wie wurden die ~7 Requirements aus Kapitel 1 getestet?[cite: 195].
+
+\section{Integrationstests der Hardware}
+% Liefen Pumpe, Motor, Display und Sensoren fehlerfrei parallel am STM32?
+
+\section{Testresultate}
+% Ergebnisse der Tests dokumentieren[cite: 199].
+
+
+% ==========================================
+% KAPITEL 5: Fazit und Lessons Learned
+% ==========================================
+\chapter{Fazit und Lessons Learned}
+% Dieser Teil ist extrem wichtig für die Präsentation und Dokumentation[cite: 176, 230].
+
+\section{Erreichte Projektziele}
+% Kurzes Fazit: Kühlt das System das Bier wie gewünscht?
+
+\section{Lessons Learned: Was gut lief}
+% Offene Kommunikation darüber, was im Team und technisch gut funktioniert hat[cite: 230].
+
+\section{Lessons Learned: Herausforderungen und Fehler}
+% Was hat weniger gut funktioniert und warum? (z.B. Probleme beim Wasserfallmodell, späte Änderungen von Relais auf PWM) [cite: 231].

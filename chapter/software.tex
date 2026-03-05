@@ -1,123 +1,148 @@
 % ==========================================
-% HAUPTKAPITEL: Software und Elektronik
+\chapter{Software}
 % ==========================================
-\chapter{Software und Elektronik}
-% Falls euer Dokument auf \section-Ebene beginnt, ändere \chapter einfach zu \section
-% und schiebe die folgenden Gliederungspunkte entsprechend noch eine Ebene tiefer.
 
-% ------------------------------------------
-% 1. Requirements Engineering
-% ------------------------------------------
-\section{Requirements Engineering}
+% ==========================================
+% PHASE 1: Anforderungsanalyse
+% ==========================================
+\section{Anforderungsanalyse}
+In der klassischen Ausprägung des Wasserfallmodells stellt die Anforderungsanalyse (Requirements Engineering) die fundamentale erste Projektphase dar. Gemäß dieser Methodik müssen alle funktionalen und nicht-funktionalen Anforderungen sowie Hardware- und Software-Restriktionen zu Beginn der Entwicklung definiert werden. Das Ziel ist es, eine verlässliche und überprüfbare Basis für die nachfolgenden Phasen (Design, Implementierung und Validierung) zu schaffen, um spätere Planungsänderungen zu vermeiden.
+
+\subsection{Hardware- und Softwareanforderungen}
+Aus der übergeordneten Systemauslegung des Bierkühlers wurden spezifische Anforderungen an die Software und die Elektronik abgeleitet. Die nachfolgende Tabelle (Tab.~\ref{tab:all_requirements}) listet die zentralen technischen Anforderungen auf, die für die Umsetzung der Steuerung relevant sind.
+
 \begin{table}[h]
 	\centering
-	\caption{Auszug der Hardware- und Softwareanforderungen (Software \& Elektronik)}
-	\label{tab:requirements}
-	% tabularx nutzt die volle Textbreite (\textwidth). 
-	% Die Spalten: l = linksbündig, X = automatische Breite mit Zeilenumbruch, c = zentriert
+	\caption{Vollständige Anforderungsliste des Projekts (Mechanik, Elektronik \& Software)}
+	\label{tab:all_requirements}
 	\begin{tabularx}{\textwidth}{l X c}
 		\toprule
 		\textbf{ID} & \textbf{Anforderung (Beschreibung)} & \textbf{Typ} \\
 		\midrule
-		ID-0008 & Die Software muss die zwei Temperatursensoren über ADC-Kanäle auslesen und die Werte in Echtzeit verarbeiten. & Funktional \\
+		ID-0001 & In den Bierkühler müssen verschiedene Flaschengrößen (0,33 L und 0,5 L) passen. & Design \\
 		\addlinespace
-		ID-0010 & Die Software muss Eingaben vom Drehregler über einen ADC-Kanal oder EXTI-Interrupt erfassen und interpretieren. & Funktional \\
+		ID-0002 & Gleiche Trinktemperatur (4 bis 7°C) bei jeder initialen Flaschentemperatur. & Performance \\
 		\addlinespace
-		ID-0011 & Die Software muss das LCD-Display über I²C ansteuern und relevante Informationen wie die aktuellen Temperaturen anzeigen. & Funktional \\
+		ID-0003 & Das Bier darf sich nicht zu schnell drehen, um übermäßiges Schäumen zu verhindern. & Performance \\
 		\addlinespace
-		ID-0013 & Die Software muss PWM-Signale generieren, um die Pumpe und den Motor stufenlos zu steuern (anstelle eines Relais). & Funktional \\
+		ID-0004 & Das Bier darf beim Drehen nicht durchrutschen (Sicherstellung des mechanischen Kontakts). & Funktional \\
 		\addlinespace
-		ID-0014 & Die Software muss DMA-Unterstützung für das effiziente ADC-Sampling der Temperatursensoren nutzen. & Performance \\
+		ID-0005 & Das Eis soll im laufenden Betrieb unkompliziert wieder auffüllbar sein. & Design \\
 		\addlinespace
-		ID-0015 & Das System muss die Spannungswandlung von 12V auf 3,3V berücksichtigen und stabile Betriebsbedingungen für die MCU sicherstellen. & Design \\
+		ID-0006 & Der Behälter muss vollständig wasserdicht sein. & Funktional \\
 		\addlinespace
-		ID-0016 & Die Software muss eine Fehlerbehandlung für die ADC-Kanäle implementieren (z.B. bei Ausfall eines Temperatursensors). & Funktional \\
+		ID-0007 & Es soll eine feste Skala für den Füllstand des Wassers/Eises geben (Min/Max). & Design \\
+		\addlinespace
+		ID-0008 & Die Software muss zwei Temperatursensoren über ADC-Kanäle auslesen und in Echtzeit verarbeiten. & Funktional \\
+		\addlinespace
+		ID-0010 & Die Software muss Eingaben vom Drehregler über ADC oder EXTI-Interrupt erfassen und interpretieren. & Funktional \\
+		\addlinespace
+		ID-0011 & Die Software muss das LCD-Display über I²C ansteuern und die aktuellen Temperaturen anzeigen. & Funktional \\
+		\addlinespace
+		ID-0013 & Die Software muss PWM-Signale generieren, um Pumpe und Motor stufenlos zu steuern (ersetzt das ursprünglich geplante Relais). & Funktional \\
+		\addlinespace
+		ID-0014 & Die Software muss DMA-Unterstützung für das effiziente ADC-Sampling der Sensoren nutzen. & Performance \\
+		\addlinespace
+		ID-0015 & Die Spannungswandlung von 12V auf 3,3V muss berücksichtigt und stabile Betriebsbedingungen für die MCU sichergestellt werden. & Design \\
+		\addlinespace
+		ID-0016 & Die Software muss eine Fehlerbehandlung für die ADC-Kanäle implementieren. & Funktional \\
 		\bottomrule
 	\end{tabularx}
 \end{table}
 
+\subsection{Anforderungsdefinition im Wasserfall-Modell}
+Da wir uns in diesem Projekt für einen Ablauf nach dem klassischen Wasserfall-Modell entschieden haben, war es zwingend notwendig, die Anforderungen zu Beginn der Entwicklungsphase zu fixieren. Hierbei gaben die mechanischen Restriktionen und das übergeordnete Projektmanagement (insbesondere die strikte Kosteneffizienz für eine potenzielle Serienproduktion) den Rahmen für die elektronischen Anforderungen vor. 
 
-\subsection{Hardware- und Softwareanforderungen}
-% Hier eine kurze Tabelle oder Liste der ca. 7 Requirements (z.B. REQ-1: Zwei Temperaturen messen, REQ-2: PWM-Steuerung für Pumpe).
+Um strukturierte und verifizierbare Ziele zu formulieren, wurden die Anforderungen nach dem SMART-Prinzip definiert und in funktionale Anforderungen (z. B. Temperaturmessung) sowie Performance- und Design-Anforderungen unterteilt. Ein wesentliches Merkmal unserer angewandten Methodik ist dabei die sogenannte Traceability: Jede in Tabelle~\ref{tab:all_requirements} definierte ID dient als direkte Vorgabe für die spätere Testspezifikation und Validierungsphase.
 
-\subsection{Reflexion zur Anforderungsanalyse}
-% Ein kurzer Absatz, warum im Rahmen des Wasserfallmodells und der Projektgröße die Anforderungen pragmatisch gehalten wurden.
+\subsubsection*{Technical Trade-offs und Hardware-Limitierungen}
+Obwohl das Wasserfall-Modell systematische Änderungen im Nachhinein erschwert, zwangen uns physische Limitierungen bei der Evaluation der Hardware zu einem kritischen \textit{Technical Trade-off}. Ursprünglich war ein binäres Schalten von Pumpe und Motor über ein elektromechanisches Relais angedacht. Bei der Konzeption stellte sich jedoch heraus, dass die GPIO-Pins des aus Kostengründen gewählten Mikrocontrollers STM32F030C8T6 nicht ausreichend Leistung bereitstellen konnten, um ein Relais direkt oder stabil über einfache Treiberstufen anzusteuern.
+
+Um dieses Hardware-Limit zu lösen und gleichzeitig die Systemanforderung an einen schaumfreien Kühlprozess (ID-0003) zu erfüllen, wurde die Vorgabe ID-0013 angepasst: Die Relais-Steuerung wurde durch eine PWM-basierte Ansteuerung (Pulsweitenmodulation) über Leistungs-MOSFETs ersetzt. Diese Design-Entscheidung entlastete den Mikrocontroller elektrisch und ermöglichte erst die präzise, stufenlose Regelung der Motordrehzahl, die für die Erfüllung der mechanischen Performance-Ziele zwingend notwendig war. Diese Anpassung wurde sauber dokumentiert und floss als feste Basis in die nachfolgende Implementierungsphase ein.
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.5\textwidth]{images/wasserfallmodel.pdf} 
+	\caption{Phasenablauf des Projekts nach dem Wasserfallmodell}
+	\label{fig:wasserfall}
+\end{figure}
+Das Projektziel fokussierte auf eine kosteneffiziente Entwicklung, die eine spätere Serienproduktion ermöglicht. Aus diesem Grund wurde bei der Komponentenauswahl ein striktes Kostenmanagement verfolgt, welches beispielsweise zur Wahl des Mikrocontrollers STM32-F030C8T6 führte. Im Rahmen des gewählten Wasserfall-Modells wurden alle benötigten Komponenten frühzeitig identifiziert und beschafft. Verzögerungen in der Testphase, bedingt durch Lieferzeiten und personelle Engpässe in der frühen Projektphase, wurden als Risiko identifiziert und durch eine straffe Planung in der anschließenden Implementierungsphase kompensiert.
 
 
-% ------------------------------------------
-% 2. Systemarchitektur und Hardware-Design
-% ------------------------------------------
-\section{Systemarchitektur und Hardware-Design}
-% Hier die Systemarchitektur beschreiben[cite: 197].
 
-\subsection{Gesamtarchitektur}
-% Platz für dein angepasstes PlantUML-Diagramm.
-% \begin{figure}[h]
-	%     \centering
-	%     \includegraphics[width=0.8\textwidth]{bilder/architektur.png}
-	%     \caption{Systemarchitektur des Bierkühlers}
-	% \end{figure}
 
-\subsection{Wahl des Mikrocontrollers und Spannungsversorgung}
+%Was sich nun zu Ende des Projektes allerdings immer stärker zeigt ist, dass dieser Entwicklungsprozess nicht rigoros verfolgt wurde. Deswegen ist auch die Anzahl der Anforderungen / Requirements mit dem Projekt nicht wirklich gewachsen oder wurde nennenswert verändert. 
+
+
+% ==========================================
+% PHASE 2: System- und Hardware-Design
+% ==========================================
+\section{System- und Hardware-Design}
+% In der Design-Phase des Wasserfall-Modells wird die Architektur auf Basis der Requirements entworfen.
+
+\subsection{Systemarchitektur}
+% Platz für dein angepasstes PlantUML-Diagramm. Hier beschreibst du das große Ganze.
+
+\subsection{Komponentenauswahl und Technical Trades}
+% Technical Trades sind laut Vorgaben wichtig.
+\subsubsection{Mikrocontroller und Spannungsversorgung}
 % Warum der STM32? Erklärung der 3,3V / 12V Versorgungskomponenten.
-
-\subsection{Sensorik (Eingabe)}
-% Beschreibung der beiden Thermometer und deren Anbindung über den ADC.
-
-\subsection{Aktorik (Ausgabe) und Technical Trades}
-% Technical Trades[cite: 93].
-% SEHR WICHTIG: Hier erklären, warum das Relais durch PWM-Module für Pumpe und Motor ersetzt wurde (z.B. stufenlose Regelung).
-
-\subsection{User Interface}
-% Anbindung und Ansteuerung des Displays über I²C.
+\subsubsection{Sensoren (Eingabe) und Aktoren (Ausgabe)}
+% Beschreibung der beiden Thermometer (ADC).
+% WICHTIG: Erkläre hier detailliert den Wechsel von Relais auf PWM (Hardware-Sicht).
+\subsubsection{User Interface}
+% Anbindung des Displays über I²C.
 
 
-% ------------------------------------------
-% 3. Software-Design und Implementierung
-% ------------------------------------------
-\section{Software-Design und Implementierung}
-% Hier die Softwarearchitektur beschreiben[cite: 201].
+% ==========================================
+% PHASE 3: Implementierung
+% ==========================================
+\section{Software-Entwurf und Implementierung}
+% Nach Abschluss des Hardware-Designs begann strikt die Implementierungsphase.
 
-\subsection{Software-Architektur und Main-Loop}
-% Flussdiagramm eurer Software. Beschreibung, dass es sich um ein "MCT optimiertes Design" handelt[cite: 180].
+\subsection{Software-Architektur}
+% Flussdiagramm eurer Software. Ein "MCT optimiertes Design" aufzeigen.
 
-\subsection{Peripherie-Setup und Treiber}
-\subsubsection{I²C-Kommunikation (Display)}
-\subsubsection{PWM-Generierung (Motor und Pumpe)}
-\subsubsection{ADC-Konfiguration (Temperatursensoren)}
+\subsection{Peripherie-Setup und Treiberentwicklung}
+% Wie wurden die Komponenten programmiertechnisch umgesetzt?
+\subsubsection{I²C-Kommunikation für das LCD-Display}
+\subsubsection{PWM-Generierung für Motor und Pumpe}
+\subsubsection{ADC-Konfiguration und DMA für Temperatursensoren}
 
 \subsection{Code-Qualität und Dokumentation}
-% Verweis auf "Applicable Standards and Rules (Coding Rules)"[cite: 206].
-% Kurzes Beispiel zeigen, wie ihr Doxygen für die Code-Dokumentation genutzt habt[cite: 170, 258].
+% Zeigen, welche "Applicable Standards and Rules (Coding Rules)" angewandt wurden.
+% Kurzes Beispiel zeigen, wie ihr den Code mit Doxygen dokumentiert habt.
 
 
-% ------------------------------------------
-% 4. Test und Validierung
-% ------------------------------------------
+% ==========================================
+% PHASE 4: Test und Validierung
+% ==========================================
 \section{Test und Validierung}
-% Test Specification and Report[cite: 190].
+% In der Testphase wird geprüft, ob die Software die Requirements aus Phase 1 erfüllt.
 
-\subsection{Testfälle (Test Cases)}
-% Wie wurden die ~7 Requirements getestet? [cite: 195]
+\subsection{Testspezifikation (Test Cases)}
+% Wie wurden die in Abschnitt 1 definierten Requirements getestet?
 
-\subsection{Integrationstests der Hardware}
-% Liefen Pumpe, Motor, Display und Sensoren fehlerfrei parallel am STM32?
+\subsection{Integrationstests}
+% Liefen Pumpe, Motor, Display und Sensoren fehlerfrei parallel? 
+% Gab es Probleme, weil Hard- und Software im Wasserfall-Modell erst spät zusammenkamen?
 
 \subsection{Testresultate}
-% Ergebnisse der Tests dokumentieren[cite: 199].
+% Konkrete Ergebnisse dokumentieren.
 
 
-% ------------------------------------------
-% 5. Fazit und Lessons Learned
-% ------------------------------------------
+% ==========================================
+% PHASE 5: Projektabschluss
+% ==========================================
 \section{Fazit und Lessons Learned}
-% Dieser Teil ist extrem wichtig für die Präsentation und Dokumentation[cite: 176, 230].
+% Dieser Teil ist extrem wichtig für die Bewertung.
 
-\subsection{Erreichte Projektziele}
-% Kurzes Fazit: Kühlt das System das Bier wie gewünscht?
+\subsection{Bewertung des Wasserfall-Modells}
+% Wie gut hat das Wasserfall-Modell für euer spezifisches Projekt funktioniert? 
+% Wo stieß dieser starre Ansatz an seine Grenzen (z.B. bei späten Hardware-Änderungen)?
 
-\subsection{Lessons Learned: Was gut lief}
-% Offene Kommunikation darüber, was im Team und technisch gut funktioniert hat[cite: 230].
+\subsection{Was gut lief}
+% Offen in der Gruppe analysieren, was technisch gut funktioniert hat.
 
-\subsection{Lessons Learned: Herausforderungen und Fehler}
-% Was hat weniger gut funktioniert und warum? [cite: 231] (z.B. Probleme beim Wasserfallmodell, späte Änderungen von Relais auf PWM).
+\subsection{Herausforderungen und Fehler}
+% Was hat weniger gut funktioniert und warum? 
+% Ein Zurückhalten von Fehlschlägen verschlechtert die Effizienz – daher offene Kommunikation.

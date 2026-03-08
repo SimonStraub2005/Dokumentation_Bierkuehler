@@ -6,7 +6,36 @@ Im Rahmen dieses Projektes wurde erfolgreich ein funktionsfähiger Prototyp zur 
 
 Die Ergebnisse der Validierungsphase belegen, dass das elektronische und informationstechnische Fundament des Bierkühlers äußerst solide ist. Die Implementierung der Software-Architektur auf dem STM32-Mikrocontroller – bestehend aus einer Super-Loop, hardwarenahem Bit-Banging für das 1-Wire-Protokoll und ereignisgesteuerten Interrupts (EXTI) – funktionierte verzögerungsfrei und zuverlässig. Auch die eigens entwickelte Python-Host-Software zur seriellen Datenaufzeichnung und Echtzeit-Visualisierung erwies sich als wertvolles Instrument zur Systemüberwachung. Der finale Testlauf, bei dem eine geschlossene Flasche innerhalb von sechs Minuten um 5\,°C abgekühlt wurde, bestätigte den \textit{Proof of Concept} des mechanischen Rotationsprinzips im Wasserbad.
 
-An diesem Punkt muss allerdings auch eingebracht werden, dass nicht alles wirklich so rund lief, wie es diese Dokumentation vermuten lässt. Wie zum Ende erkennbar ist, wurde die Validierungsphase durch zeitmangel verkürzt.
+\subsection{Kritische Reflexion und Lessons Learned}
+Trotz der erfolgreichen technischen Umsetzung offenbarte der Projektverlauf konzeptionelle und organisatorische Schwächen, die zu einer signifikanten Verkürzung der finalen Validierungsphase führten. Eine retrospektive Analyse identifiziert im Wesentlichen drei Problemfelder, die den Entwicklungsprozess ineffizient gestalteten:
+
+\begin{enumerate}
+	\item \textbf{Projektmanagement und Methodik:} 
+	Die Entscheidung für das klassische Wasserfallmodell fiel primär aus Gründen der vermeintlich geringeren administrativen Komplexität und weniger aufgrund einer Eignungsprüfung für das vorliegende Projekt. Dies förderte eine streng sequentielle Arbeitsweise ('Silo-Denken'), bei der Arbeitspakete ohne inhaltliche Überschneidungen weitergereicht wurden. Die fehlende Parallelisierung von Aufgaben führte zu erheblichen Ressourcenleerläufen und Reibungsverlusten im Team. Die Erkenntnis hieraus ist, dass ein proaktives Projekt- und Qualitätsmanagement essenziell ist, um Entwicklungsphasen zu synchronisieren und Motivationstiefs zu vermeiden.
+	
+	\item \textbf{Beschaffungs- und Konfigurationsmanagement:} 
+	Ein kritischer Fehler in der Materialbeschaffung führte zu massiven Verzögerungen in der Softwareentwicklung. Der Plan, mehrere Prototypen parallel zu fertigen, erforderte die Nachbestellung weiterer Mikrocontroller. Unter der falschen Prämisse, dass es sich dabei exakt um dasselbe Modell (STM32F030) wie beim initialen Referenzboard handelte, wurden Derivate einer leistungsstärkeren, aber architektonisch abweichenden Baureihe (STM32F103) beschafft. Da die Artikelbeschreibung nicht ausreichend geprüft wurde, blieb diese Hardware-Diskrepanz zunächst unbemerkt und führte zu zwei gravierenden Problemen im Entwicklungsablauf:
+	\begin{itemize}
+		\item \textit{Fehlgeleitetes Debugging (Problem 1):} Da die Inkompatibilität der Hardware nicht bekannt war, versuchte das Team über mehrere Wochen hinweg, die für den STM32F030 geschriebene Software auf den neuen Platinen zum Laufen zu bringen. Die Fehleranalyse fokussierte sich dabei fälschlicherweise ausschließlich auf vermeintliche Logik- und Konfigurationsfehler im eigenen Code. Diese systematische Fehlersuche an der falschen Stelle resultierte in einer enormen und vermeidbaren Zeitverschwendung.
+		\item \textit{Systeminstabilitäten durch Registerzugriffe (Problem 2):} Nachdem der Hardware-Irrtum schließlich identifiziert wurde, migrierte das Team die Software-Architektur auf den STM32F103, um die neu beschafften Platinen nutzen zu können. Obwohl das System anfänglich funktionierte, traten im weiteren Verlauf kritische Hardware-Ausfälle auf, bei denen die Mikrocontroller vorerst ihre Funktion einstellten. Erst nach neuem Beschreiben mit anderer Software funktionierten sie wieder. Laut ihnen handelte es sich dabei um falsch beschrieben Register. 
+	\end{itemize}
+	Aufgrund dieser schwerwiegenden Komplikationen und der fehlenden Gewissheit über die exakte Ursache der Registerausfälle sah sich das Team gezwungen, das Vorhaben der Serienproduktion zu verwerfen und wieder auf das ursprüngliche STM32F030-Referenzmodell zurückzuwechseln. Die erneute Rückmigration der Codebasis konnte in der Zwischenzeit zwar durch den Einsatz KI-gestützter Werkzeuge stark beschleunigt werden, verdeutlichte aber abermals die massiven prozessualen Auswirkungen eines unzureichenden Hardware- und Konfigurationsmanagements.
+	
+	\item \textbf{Verfrühte Systemintegration und mangelnde Modularität:} 
+	Ein weiterer prozessualer Fehler bestand in der vorzeitigen finalen Verdrahtung und Montage der Hardware, noch bevor die Software validiert und die Mikrocontroller-Thematik geklärt war. Der Prototyp wurde nicht ausreichend modular konzipiert. Die darauffolgenden, zwangsläufigen Hardware-Eingriffe und das ständige Austauschen des Mikrocontrollers führten zu mechanischen Belastungen, gelösten Lötstellen und einem insgesamt stark erschwerten Debugging-Prozess.
+	
+Diese drei Probleme hatten durch den hohen Zeitkonsum zur Folge, dass, vor allem bei der Software, mehr KI als ursprünglich geplant zum Einsatz kam. Das ist nicht unbedingt etwas schlechtes, da es ja am Ende zum Projekterfolg beigetragen hat, jedoch verkleinert es den natürlichen Lernprozess. 
+\end{enumerate}
+
+\subsection{Präventive Ansätze für zukünftige Entwicklungszyklen}
+Um die identifizierten Fehlerquellen in zukünftigen Projekten oder einer potenziellen Serienreife (Version 2.0) zu vermeiden, sollten folgende methodische und technische Herangehensweisen etabliert werden:
+
+\begin{itemize}
+	\item \textbf{Anwendung iterativer Vorgehensmodelle:} Anstelle des starren Wasserfallmodells sollte das V-Modell oder ein agiler Ansatz (z.\,B. Scrum) gewählt werden. Dies erzwingt regelmäßige Synchronisationspunkte (Stand-ups) im Team, ermöglicht eine parallele Entwicklung von Hard- und Software und deckt Integrationsprobleme frühzeitig ab.
+	\item \textbf{Striktes Wareneingangs- und Konfigurationsmanagement:} Vor Entwicklungsbeginn muss ein Abgleich zwischen bestellter und gelieferter Hardware (Part-Nummern, Datenblätter) erfolgen. Die Software sollte zudem modular über Hardware Abstraction Layers (HAL) aufgebaut werden, um Portierungen zwischen verschiedenen Mikrocontroller-Derivaten fehlerfrei zu ermöglichen.
+	\item \textbf{Modularer Prototypenbau (Hardware-in-the-Loop):} Die physische Festverdrahtung oder das Verlöten von Komponenten darf erst erfolgen, wenn die Software-Basis in einer offenen Breadboard- oder Testumgebung (Evaluierungsboard) vollständig validiert wurde. Alternativ sind standardisierte Steckverbinder (z.\,B. JST-Stecker) anstelle direkter Lötverbindungen zu verwenden.
+	\item \textbf{Kontinuierliche Systemintegration (Continuous Integration):} Hard- und Software sollten schrittweise und nicht erst am Ende des Projekts zusammengeführt werden. Einzelne Module (z.\,B. Motorsteuerung, Sensorauslesung) müssen isoliert getestet und erst bei erfolgreicher Validierung in das Gesamtsystem integriert werden.
+\end{itemize}
 
 \section{Ausblick und Weiterentwicklung (Version 2.0)}
 Basierend auf den gewonnenen Erkenntnissen ergeben sich für eine zukünftige Iteration des Kühlsystems (Version 2.0) konkrete Optimierungsansätze in den Bereichen Mechanik, Elektronik und Software:

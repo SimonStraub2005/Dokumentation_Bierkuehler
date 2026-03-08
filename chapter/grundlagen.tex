@@ -1,8 +1,49 @@
 \chapter{Grundlagen}
-\label{cha:Grundlagen}
+\label{cha:Grundlagen des Kühlmechanismus}
 
-Zielgerichtete theoretische Grundlagen, sowohl fachliche, wie auch methodische.
+\section{Grundlagen des Kühlmechanismus}
 
-Zu den Grundlagen gehören \glsentryshort{acr:zb} auch Details zur Problemstellung, der Stand der Technik und weitere Grundlagen, welche zur Konzeptausarbeitung, Umsetzung und Verifikation erforderlich sind.
+Um die Funktionsweise des entwickelten Bierkühlers vollständig zu verstehen, werden zunächst die physikalischen Grundlagen der Wärmeübertragung betrachtet. Der Kühlprozess basiert im Wesentlichen auf den Mechanismen der Wärmeleitung, der Konvektion sowie – in deutlich geringerem Maße – der Wärmestrahlung. Für das vorliegende System sind insbesondere Wärmeleitung und Konvektion entscheidend.
 
-Grundlagen haben immer einen Bezug zu den nachfolgenden Kapiteln. Diesen Bezug sollte man gelegentlich explizit herstellen, damit bereits in diesem Kapitel klar ist, wo und für was die Grundlagen gebraucht und angewandt werden.
+\subsection{Wärmeübertragung beim statischen Kühlen}
+
+Wird eine Bierflasche in ein kaltes Wasserbad gestellt, läuft der Kühlprozess in mehreren Schritten ab:
+
+\begin{enumerate}
+	\item \textbf{Wärmeleitung im Inneren der Flasche} \\
+	Das wärmere Bier gibt Wärme an die innere Glaswand der Flasche ab.
+	
+	\item \textbf{Wärmeleitung durch das Glas} \\
+	Die Wärme wird durch die Glaswand nach außen transportiert.
+	
+	\item \textbf{Wärmeübergang an das Kühlwasser} \\
+	Die äußere Glasoberfläche gibt die Wärme an das umgebende Wasser ab.
+\end{enumerate}
+
+
+
+\begin{center}
+	Bierkern $\rightarrow$ Glaswand $\rightarrow$ Kühlwasser $\rightarrow$ Umgebung
+\end{center}
+
+
+Zunächst kühlt sich das Bier in unmittelbarer Nähe zur Innenwand ab. Es bildet sich eine sogenannte \textit{thermische Grenzschicht}. Diese besteht aus bereits abgekühlter Flüssigkeit, die zwischen der Glaswand und dem noch wärmeren Flüssigkeitskern liegt.
+
+Da Flüssigkeiten ohne Bewegung Wärme nur durch molekulare Wärmeleitung übertragen, verläuft der Wärmetransport vom warmen Kern zur gekühlten Randzone relativ langsam. Die Grenzschicht wirkt daher isolierend und reduziert den weiteren Wärmefluss. Sie entsteht durch die ungleichmäßige Temperaturverteilung im Inneren der Flüssigkeit. Das kühlere, dichtere Bier verbleibt zunächst in Wandnähe, während der wärmere Kern erstmals noch warm bleibt.
+
+
+\subsection{Prinzip der erzwungenen Konvektion}
+
+Der entwickelte Bierkühler verhindert die Ausbildung einer stabilen Grenzschicht, indem er das Bier kontinuierlich in Rotation versetzt. Durch diese Bewegung wird die Flüssigkeit permanent durchgemischt.
+
+Dieser Prozess wird als \textit{erzwungene Konvektion} bezeichnet. Im Gegensatz zur natürlichen Konvektion wird die Strömung hier aktiv durch eine mechanische Kraft erzeugt – im vorliegenden System durch Motor, Welle und Steuerungseinheit in Form des Mikrocontrollers.
+
+Die Rotation sorgt für eine kontinuierliche Zerstörung der thermischen Grenzschicht und fördern den Transport vom warmen Bier zur Glaswand und vom kühlen Bier vom Rand ins innere. Der Temperaturgradient an der Wand bleibt somit groß, sodass der Wärmestrom aufrechterhalten wird.
+
+
+\subsection{Einflussfaktoren auf die Kühlleistung}
+
+Die Effizienz des Systems hängt von der Drehzahl der Rotation, der Temperatur des Kühlwassers, der Wassermenge, dem Material und Wandstärke der Flasche und der Anfangstemperatur des Bieres ab.
+
+Eine höhere Drehzahl verbessert die Durchmischung und erhöht den Wärmeübergangskoeffizienten. Allerdings muss die Drehzahl so gewählt werden, dass keine übermäßige Schaumbildung oder mechanische Belastung der Flasche entsteht. Kühleres Wasser fördert die schnelle Kühlung, mehr Wasser fördert auch die schnelle Kühlung, ist der Wasserspiegel jedoch zu hoch, bringt die Kühlung jedoch nichts, da die \textit{erzwungene Konvektion} bei zu viel Wasser nutzlos ist. Eine dickere Wand ist ebenso wie die Anfangstemperatur kontraproduktiv und verlangsamt die Kühlung.
+

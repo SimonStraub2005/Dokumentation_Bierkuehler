@@ -1,0 +1,26 @@
+\chapter{Fazit und Ausblick}
+\label{cha:fazit}
+
+\section{Fazit}
+Im Rahmen dieses Projektes wurde erfolgreich ein funktionsfähiger Prototyp zur automatisierten Getränkekühlung entwickelt. Der methodische Ansatz, basierend auf dem Wasserfall-Modell, ermöglichte eine strukturierte Umsetzung von der Anforderungsanalyse bis hin zum fertigen System. 
+
+Die Ergebnisse der Validierungsphase belegen, dass das elektronische und informationstechnische Fundament des Bierkühlers äußerst solide ist. Die Implementierung der Software-Architektur auf dem STM32-Mikrocontroller – bestehend aus einer Super-Loop, hardwarenahem Bit-Banging für das 1-Wire-Protokoll und ereignisgesteuerten Interrupts (EXTI) – funktionierte verzögerungsfrei und zuverlässig. Auch die eigens entwickelte Python-Host-Software zur seriellen Datenaufzeichnung und Echtzeit-Visualisierung erwies sich als wertvolles Instrument zur Systemüberwachung. Der finale Testlauf, bei dem eine geschlossene Flasche innerhalb von sechs Minuten um 5\,°C abgekühlt wurde, bestätigte den \textit{Proof of Concept} des mechanischen Rotationsprinzips im Wasserbad.
+
+An diesem Punkt muss allerdings auch eingebracht werden, dass nicht alles wirklich so rund lief, wie es diese Dokumentation vermuten lässt. Wie zum Ende erkennbar ist, wurde die Validierungsphase durch zeitmangel verkürzt.
+
+\section{Ausblick und Weiterentwicklung (Version 2.0)}
+Basierend auf den gewonnenen Erkenntnissen ergeben sich für eine zukünftige Iteration des Kühlsystems (Version 2.0) konkrete Optimierungsansätze in den Bereichen Mechanik, Elektronik und Software:
+
+\begin{itemize}
+	\item \textbf{Mechanik und Aktorik:} Der aktuell verwendete N20-Getriebemotor ist für die dauerhafte dynamische Belastung einer vollen Flasche unterdimensioniert. Ein Austausch durch einen leistungsfähigeren DC-Motor oder Schrittmotor mit einem wesentlich größeren Wellendurchmesser und einer formschlüssigen Kupplung (z.\,B. aus gefrästem Aluminium) ist zwingend erforderlich, um mechanischen Abrieb zu verhindern.
+	
+	\item \textbf{Elektronische Integration:} Um die temporären Kontaktverluste der Jumper-Kabel zu eliminieren, muss die Elektronik von der Breadboard-Ebene auf eine fest verlötete Lochrasterplatine oder idealerweise auf ein dediziertes \textit{Printed Circuit Board} (PCB) überführt werden. Dies würde auch die Störanfälligkeit bei Spannungsschwankungen weiter minimieren.
+	
+	\item \textbf{Erweitertes User Interface (Rotary Encoder):} Der aus Zeitgründen gestrichene Rotary Encoder sollte wieder in das System integriert werden. Dies würde die dynamische Einstellung einer Zieltemperatur direkt über das OLED-Display ermöglichen, ohne den Mikrocontroller neu flashen zu müssen.
+	
+	\item \textbf{Softwareseitige Flaschenprofile:} Durch die Aufnahme weiterer empirischer Messreihen könnten gerätespezifische Kühlkurven ermittelt werden. Darauf basierend ließe sich ein Menüpunkt ,,Flaschenwahl'' (z.\,B. 0,33\,L Glas, 0,5\,L Glas oder Aluminiumdose) implementieren, durch den das System die benötigte Kühldauer automatisch prädiktiv berechnet.
+	
+	\item \textbf{Aktive Kühlung (Kühlsystem-Upgrade):} Um das System von der manuellen Zugabe von Eiswürfeln unabhängig zu machen, könnte das Wasserbad mit aktiven Kühlelementen (z.\,B. leistungsstarke Peltier-Elemente mit großen Kühlkörpern oder ein Miniatur-Kompressor) ausgestattet werden. Dies würde die Autonomie und den Komfort des Geräts massiv steigern.
+	
+	\item \textbf{Regelungstechnik:} Anstelle der reinen PWM-Steuerung könnte softwareseitig ein PID-Regler (Proportional-Integral-Derivative) implementiert werden. Dieser könnte die Pumpenleistung und Rotationsgeschwindigkeit dynamisch an die Temperaturdifferenz anpassen, um die Kühlgeschwindigkeit zu maximieren und gleichzeitig die Schaumbildung bei Erreichen der Zieltemperatur sanft zu minimieren.
+\end{itemize}

@@ -1,134 +1,9 @@
-% ==========================================
-\chapter{Software und Validierung des Prototyps}
-% ==========================================
+\chapter{Software-Entwurf und Implementierung}
+\label{cha:software}
 
-% ==========================================
-% PHASE 1: Anforderungsanalyse
-% ==========================================
-\section{Anforderungsanalyse}
-In der klassischen Ausprägung des Wasserfallmodells stellt die Anforderungsanalyse (Requirements Engineering) die fundamentale erste Projektphase dar. Gemäß dieser Methodik müssen alle funktionalen und nicht-funktionalen Anforderungen sowie Hardware- und Software-Restriktionen zu Beginn der Entwicklung definiert werden. Das Ziel ist es, eine verlässliche und überprüfbare Basis für die nachfolgenden Phasen (Design, Implementierung und Validierung) zu schaffen, um spätere Planungsänderungen zu vermeiden.
-
-\subsection{Hardware- und Softwareanforderungen}
-Aus der übergeordneten Systemauslegung des Bierkühlers wurden spezifische Anforderungen an die Software und die Elektronik abgeleitet. Die nachfolgende Tabelle (Tab.~\ref{tab:all_requirements}) listet die zentralen technischen Anforderungen auf, die für die Umsetzung der Steuerung relevant sind.
-
-\begin{table}[h]
-	\centering
-	\caption{Vollständige Anforderungsliste des Projekts (Mechanik, Elektronik \& Software)}
-	\label{tab:all_requirements}
-	\begin{tabularx}{\textwidth}{l X c}
-		\toprule
-		\textbf{ID} & \textbf{Anforderung (Beschreibung)} & \textbf{Typ} \\
-		\midrule
-		ID-0001 & In den Bierkühler müssen verschiedene Flaschengrößen (0,33 L und 0,5 L) passen. & Design \\
-		\addlinespace
-		ID-0002 & Gleiche Trinktemperatur (4 bis 7°C) bei jeder initialen Flaschentemperatur. & Performance \\
-		\addlinespace
-		ID-0003 & Das Bier darf sich nicht zu schnell drehen, um übermäßiges Schäumen zu verhindern. & Performance \\
-		\addlinespace
-		ID-0004 & Das Bier darf beim Drehen nicht durchrutschen (Sicherstellung des mechanischen Kontakts). & Funktional \\
-		\addlinespace
-		ID-0005 & Das Eis soll im laufenden Betrieb unkompliziert wieder auffüllbar sein. & Design \\
-		\addlinespace
-		ID-0006 & Der Behälter muss vollständig wasserdicht sein. & Funktional \\
-		\addlinespace
-		ID-0007 & Es soll eine feste Skala für den Füllstand des Wassers/Eises geben (Min/Max). & Design \\
-		\addlinespace
-		ID-0008 & Die Software muss zwei Temperatursensoren über ADC-Kanäle auslesen und in Echtzeit verarbeiten. & Funktional \\
-		\addlinespace
-		ID-0010 & Die Software muss Eingaben vom Drehregler über ADC oder EXTI-Interrupt erfassen und interpretieren. & Funktional \\
-		\addlinespace
-		ID-0011 & Die Software muss das LCD-Display über I²C ansteuern und die aktuellen Temperaturen anzeigen. & Funktional \\
-		\addlinespace
-		ID-0013 & Die Software muss PWM-Signale generieren, um Pumpe und Motor stufenlos zu steuern (ersetzt das ursprünglich geplante Relais). & Funktional \\
-		\addlinespace
-		ID-0014 & Die Software muss DMA-Unterstützung für das effiziente ADC-Sampling der Sensoren nutzen. & Performance \\
-		\addlinespace
-		ID-0015 & Die Spannungswandlung von 12V auf 3,3V muss berücksichtigt und stabile Betriebsbedingungen für die MCU sichergestellt werden. & Design \\
-		\addlinespace
-		ID-0016 & Die Software muss eine Fehlerbehandlung für die ADC-Kanäle implementieren. & Funktional \\
-		\bottomrule
-	\end{tabularx}
-\end{table}
-
-\subsection{Anforderungsdefinition im Wasserfall-Modell}
-Da wir uns in diesem Projekt für einen Ablauf nach dem klassischen Wasserfall-Modell entschieden haben, war es zwingend notwendig, die Anforderungen zu Beginn der Entwicklungsphase zu fixieren. Hierbei gaben die mechanischen Restriktionen und das übergeordnete Projektmanagement (insbesondere die strikte Kosteneffizienz für eine potenzielle Serienproduktion) den Rahmen für die elektronischen Anforderungen vor. 
-
-Um strukturierte und verifizierbare Ziele zu formulieren, wurden die Anforderungen nach dem SMART-Prinzip definiert und in funktionale Anforderungen (z. B. Temperaturmessung) sowie Performance- und Design-Anforderungen unterteilt. Ein wesentliches Merkmal unserer angewandten Methodik ist dabei die sogenannte Traceability: Jede in Tabelle~\ref{tab:all_requirements} definierte ID dient als direkte Vorgabe für die spätere Testspezifikation und Validierungsphase.
-
-\subsubsection*{Technical Trade-offs und Hardware-Limitierungen}
-Obwohl das Wasserfall-Modell systematische Änderungen im Nachhinein erschwert, zwangen uns physische Limitierungen bei der Evaluation der Hardware zu einem kritischen \textit{Technical Trade-off}. Ursprünglich war ein binäres Schalten von Pumpe und Motor über ein elektromechanisches Relais angedacht. Bei der Konzeption stellte sich jedoch heraus, dass die GPIO-Pins des aus Kostengründen gewählten Mikrocontrollers STM32F030C8T6 nicht ausreichend Leistung bereitstellen konnten, um ein Relais direkt oder stabil über einfache Treiberstufen anzusteuern.
-
-Um dieses Hardware-Limit zu lösen und gleichzeitig die Systemanforderung an einen schaumfreien Kühlprozess (ID-0003) zu erfüllen, wurde die Vorgabe ID-0013 angepasst: Die Relais-Steuerung wurde durch eine PWM-basierte Ansteuerung (Pulsweitenmodulation) über Leistungs-MOSFETs ersetzt. Diese Design-Entscheidung entlastete den Mikrocontroller elektrisch und ermöglichte erst die präzise, stufenlose Regelung der Motordrehzahl, die für die Erfüllung der mechanischen Performance-Ziele zwingend notwendig war. Diese Anpassung wurde sauber dokumentiert und floss als feste Basis in die nachfolgende Implementierungsphase ein.
-\begin{figure}[h]
-	\centering
-	\includegraphics[width=0.5\textwidth]{images/wasserfallmodel.pdf} 
-	\caption{Phasenablauf des Projekts nach dem Wasserfallmodell}
-	\label{fig:wasserfall}
-\end{figure}
-Das Projektziel fokussierte auf eine kosteneffiziente Entwicklung, die eine spätere Serienproduktion ermöglicht. Aus diesem Grund wurde bei der Komponentenauswahl ein striktes Kostenmanagement verfolgt, welches beispielsweise zur Wahl des Mikrocontrollers STM32-F030C8T6 führte. Im Rahmen des gewählten Wasserfall-Modells wurden alle benötigten Komponenten frühzeitig identifiziert und beschafft. Verzögerungen in der Testphase, bedingt durch Lieferzeiten und personelle Engpässe in der frühen Projektphase, wurden als Risiko identifiziert und durch eine straffe Planung in der anschließenden Implementierungsphase kompensiert.
-
-
-
-
-%Was sich nun zu Ende des Projektes allerdings immer stärker zeigt ist, dass dieser Entwicklungsprozess nicht rigoros verfolgt wurde. Deswegen ist auch die Anzahl der Anforderungen / Requirements mit dem Projekt nicht wirklich gewachsen oder wurde nennenswert verändert. 
-
-
-% ==========================================
-% PHASE 2: System- und Hardware-Design
-% ==========================================
-\section{System- und Hardware-Design}
-Nach der vollständigen Definition der Systemanforderungen begann gemäß dem Wasserfall-Modell die Entwurfsphase. In diesem Schritt wurde die abstrakte Problemlösung in eine konkrete Systemarchitektur und eine physikalische Hardware-Auslegung überführt. Ein besonderer Fokus lag dabei auf der Kosteneffizienz sowie der zuverlässigen Ansteuerung der Sensorik und Aktorik.
-
-\subsection{Systemarchitektur}
-Die Systemarchitektur bildet das Herzstück des Hardware-Designs und zeigt das Zusammenspiel aller verwendeten Komponenten. Die logische und elektrische Verknüpfung der Bauteile mit dem Mikrocontroller ist in Abbildung \ref{fig:systemarchitektur} dargestellt. 
-
-\begin{figure}[h]
-	\centering
-	% Hinweis: Füge hier den korrekten Dateinamen deines exportierten PlantUML-Bildes ein
-	\includegraphics[width=\textwidth]{images/systemarchitektur.pdf} 
-	\caption{Systemarchitektur des Bierkühlers (Hardware-Ebene)}
-	\label{fig:systemarchitektur}
-\end{figure}
-
-Das System ist grob in drei funktionale Blöcke unterteilt: Die Eingabe (Sensorik und Nutzer-Interface), die zentrale Verarbeitungseinheit (MCU) und die Ausgabe (Aktorik und Display).
-
-\subsection{Komponentenauswahl und Technical Trades}
-Im Rahmen des Hardware-Designs wurden verschiedene Komponenten evaluiert und \textit{Technical Trades} (technische Abwägungen) durchgeführt, um einen Kompromiss aus Kosten, Leistungsfähigkeit und Entwicklungsaufwand zu finden.
-
-\subsubsection{Mikrocontroller und Spannungsversorgung}
-Als zentrale Steuereinheit wurde der \textbf{STM32F030C8T6} gewählt. Dieser Mikrocontroller bietet für das Projekt die ideale Balance aus geringen Beschaffungskosten und ausreichender Peripherieausstattung (mehrere ADC-Kanäle, Hardware-Timer für PWM und I²C-Schnittstellen). \cite{stm32f030_datasheet} 
-
-Das System arbeitet mit zwei Spannungsdomänen:
-\begin{itemize}
-	\item \textbf{12V-Kreis:} Die Aktorik (Motor für die Flaschenrotation und Wasserpumpe) benötigt eine höhere Leistung, die direkt vom Netzteil bereitgestellt wird.
-	\item \textbf{3,3V-Kreis:} Ein Spannungswandler (Step-Down) transformiert die 12V auf 3,3V, um den Mikrocontroller, das Display und die Sensoren stabil zu versorgen.
-\end{itemize}
-
-\subsubsection{Sensorik (Eingabe)}
-Für die Temperaturüberwachung (vgl. Anforderung ID-0008) kommen zwei digitale Temperatursensoren vom Typ \textbf{DS18B20} zum Einsatz. Ein Sensor überwacht die Wassertemperatur im Kühlbehälter, der zweite die Umgebungstemperatur. Im Gegensatz zu analogen Sensoren werden diese direkt über das 1-Wire-Protokoll an handelsüblichen GPIO-Pins des STM32 ausgelesen \cite{ds18b20_datasheet}, was den internen ADC (Analog-to-Digital Converter) entlastet und die Anfälligkeit für Signalrauschen minimiert.
-
-Im Rahmen eines iterativen Scope-Managements wurde aus zeitlichen Restriktionen auf den ursprünglich angedachten Rotary Encoder verzichtet. Für die Benutzereingabe (ID-0010) wird stattdessen ein einzelner \textbf{Taster (Knopf)} verwendet, der als zentrales Steuerelement (Start/Stopp-Logik der Kühlung sowie für Debugging-Zwecke) fungiert. Dieser ist an einen digitalen GPIO-Pin angebunden und nutzt externe Interrupts (EXTI). Dies gewährleistet, dass der Mikrocontroller verzögerungsfrei auf das Eingabesignal reagiert, ohne die CPU durch ständiges Polling zu belasten.
-
-\subsubsection{User Interface}
-Zur Visualisierung des Systemstatus (aktuelle Temperaturen und Kühlstatus) wurde ein \textbf{OLED-Display} (Controller SSD1306) implementiert. Um wertvolle GPIO-Pins am Mikrocontroller zu sparen und das Platinen-Layout einfach zu halten, wird das Display über den seriellen \textbf{I²C-Bus} (Inter-Integrated Circuit) angesteuert. Hierfür werden lediglich zwei Leitungen (SDA für Daten und SCL für den Takt) benötigt.
-
-\subsubsection{Aktorik (Ausgabe)}
-Die Ausgabe-Hardware stellte den kritischsten Punkt im Designprozess dar. Wie bereits in der Anforderungsanalyse beschrieben, wurde hier ein technischer Trade-off vollzogen: Anstelle eines elektromechanischen Relais übernehmen \textbf{Leistungs-MOSFETs} das Schalten der 12V-Komponenten. Hierzu zählen die Wasserpumpe sowie ein \textbf{N20 100RPM Getriebemotor}, der für die kontinuierliche Rotation der Flasche zuständig ist. 
-
-Das Gate dieser Leistungstransistoren ist direkt mit den entsprechenden GPIO-Pins des STM32 verbunden. Durch die Ausgabe eines Pulsweitenmodulations-Signals (PWM) kann die zugeführte Leistung für Motor und Pumpe stufenlos und nahezu leistungslos geregelt werden. Dies schützt den Mikrocontroller vor elektrischer Überlastung und erfüllt gleichzeitig die Performance-Anforderung (ID-0003), die Rotationsgeschwindigkeit präzise anzupassen, um das Bier vor übermäßigem Schäumen zu bewahren.
-
-
-\subsubsection{User Interface}
-Zur Visualisierung des Systemstatus (aktuelle Temperaturen und Zieltemperatur) wurde ein LCD-Display implementiert. Um wertvolle GPIO-Pins am Mikrocontroller zu sparen und das Platinen-Layout einfach zu halten, wird das Display über den seriellen \textbf{I²C-Bus} (Inter-Integrated Circuit) angesteuert. Hierfür werden lediglich zwei Leitungen (SDA für Daten und SCL für den Takt) benötigt.
-
-
-% ==========================================
-% PHASE 3: Software-Entwurf und Implementierung
-% ==========================================
-\section{Software-Entwurf und Implementierung}
 Nach Abschluss der Hardware-Planung erfolgte die Entwicklung der Systemsoftware. Die Programmierung des STM32F030C8T6 wurde in C unter Verwendung der STM32CubeIDE und der Hardware Abstraction Layer (HAL) Bibliothek von STMicroelectronics umgesetzt. Der Fokus lag auf einer ressourcenschonenden und blockierungsfreien Ausführung der Kernprozesse.
 
-\subsection{Software-Architektur und Programmablauf}
+\section{Software-Architektur und Programmablauf}
 Die grundlegende Architektur der Software basiert auf einer klaren Trennung zwischen kontinuierlichen Hintergrundprozessen (\textit{Super-Loop}) und ereignisgesteuerten Nutzereingaben (Interrupts). Das System operiert in einer vereinfachten Zustandsmaschine (State Machine) mit zwei Hauptzuständen, die über die globale Flag-Variable \texttt{system\_laeuft} gesteuert werden:
 
 \begin{enumerate}
@@ -138,7 +13,7 @@ Die grundlegende Architektur der Software basiert auf einer klaren Trennung zwis
 
 Um eine detaillierte und gut lesbare Darstellung des Software-Designs zu gewährleisten, wurde das Programmablauf-Diagramm logisch in die zyklische Main-Loop (Abbildung \ref{fig:main_loop}) und die asynchrone Interrupt Service Routine (Abbildung \ref{fig:isr}) unterteilt.
 
-\subsubsection{Ablauf der Main-Loop}
+\subsection{Ablauf der Main-Loop}
 Die Main-Loop steuert den zyklischen Hauptablauf des Systems. Nach der initialen Konfiguration der Hardware-Peripherie tritt der Mikrocontroller in die Endlosschleife (\texttt{while(1)}) ein. Hier werden bei jedem Durchlauf zunächst die \texttt{MARKER}-Flags ausgewertet, um bei Zustandsänderungen entsprechende UART-Signale an den Host-PC zu senden. Anschließend erfolgt die Temperaturmessung beider Sensoren, gefolgt von der Aktualisierung des OLED-Displays und dem seriellen Datenversand.
 
 \begin{figure}[htbp]
@@ -148,7 +23,7 @@ Die Main-Loop steuert den zyklischen Hauptablauf des Systems. Nach der initialen
 	\label{fig:main_loop}
 \end{figure}
 
-\subsubsection{Ereignisgesteuerte Benutzereingabe und Interrupt Service Routine (ISR)}
+\subsection{Ereignisgesteuerte Benutzereingabe und Interrupt Service Routine (ISR)}
 Anstatt den Zustand des UI-Tasters zyklisch in der Main-Loop abzufragen (Polling), wurde der entsprechende GPIO-Pin hardwareseitig mit einem externen Interrupt (EXTI Line 0) belegt. Löst der Taster eine fallende Flanke aus, unterbricht der Mikrocontroller die Main-Loop sofort und springt in die asynchrone Interrupt Service Routine (ISR), die in Abbildung \ref{fig:isr} dargestellt ist.
 
 Diese Routine arbeitet unabhängig vom Hauptzyklus und ist ausschließlich für die unmittelbare Verarbeitung der Benutzereingaben über die \texttt{HAL\_GPIO\_EXTI\_Callback()}-Funktion zuständig. Da mechanische Taster beim Drücken oft mehrfach den Kontakt schließen (Prellen), wurde in der Software eine \textit{Entprellung} (Debouncing) implementiert. Durch den Abgleich mit der System-Tick-Zeit (\texttt{HAL\_GetTick()}) werden aufeinanderfolgende Hardware-Interrupts innerhalb von 200\,ms ignoriert, sodass nur der erste, bewusste Tastendruck registriert wird. 
@@ -162,145 +37,40 @@ Bei einem validierten Signal schaltet die ISR den Systemzustand um (Starten oder
 	\label{fig:isr}
 \end{figure}
 
-\subsection{Implementierung der Schnittstellen und Peripherie}
+\section{Implementierung der Schnittstellen und Peripherie}
 
-\subsubsection{Temperaturerfassung via 1-Wire-Protokoll}
-Eine technische Herausforderung bestand in der softwareseitigen Implementierung des 1-Wire-Protokolls (Bit-Banging) für die digitalen Sensoren DS18B20. Da das Protokoll strikte Timing-Vorgaben im Mikrosekundenbereich fordert, reicht die standardmäßige \texttt{HAL\_Delay()}-Funktion (welche im Millisekundenbereich arbeitet) nicht aus. 
-Zur Lösung dieses Problems wurde der Hardware-Timer \texttt{TIM6} als hochpräziser Mikrosekunden-Zähler konfiguriert. 
+\subsection{Temperaturerfassung via 1-Wire-Protokoll}
+Eine technische Herausforderung bestand in der softwareseitigen Implementierung des 1-Wire-Protokolls (Bit-Banging) für die digitalen Sensoren DS18B20. Da das Protokoll strikte Timing-Vorgaben im Mikrosekundenbereich fordert, reicht die standardmäßige \texttt{HAL\_Delay()}-Funktion (welche im Millisekundenbereich arbeitet) nicht aus. Zur Lösung dieses Problems wurde der Hardware-Timer \texttt{TIM6} als hochpräziser Mikrosekunden-Zähler konfiguriert.
 
 Um die Performance der Main-Loop zu optimieren, werden beide Sensoren parallel ausgelesen: Beide DS18B20 erhalten sequenziell den Befehl zur Temperaturkonvertierung (\texttt{0x44}). Anschließend pausiert der Mikrocontroller für die vom Datenblatt \cite{ds18b20_datasheet} geforderten 800\,ms, während \textit{beide} Sensoren intern messen. Dieses Vorgehen halbiert die Blockierungszeit der Main-Loop im Vergleich zum seriellen Auslesen.
 
-\subsubsection{PWM-Steuerung der Aktorik}
+\subsection{PWM-Steuerung der Aktorik}
 Zur Erfüllung der Anforderung ID-0003 (Verhinderung von übermäßigem Schäumen) werden die 12V-Aktoren stufenlos betrieben. Hierfür wurden die Timer \texttt{TIM3} und \texttt{TIM15} im PWM-Modus konfiguriert. Über die Einstellung des Duty-Cycles (Tastgrads) in den jeweiligen Compare-Registern lässt sich die Durchschnittsspannung an den Gates der Leistungs-MOSFETs und damit die Drehzahl von Motor und Pumpe exakt justieren.
 
-\subsubsection{User Interface und Datenlogging}
+\subsection{User Interface und Datenlogging}
 Die Ausgabe der Systemdaten erfolgt zweigleisig:
 \begin{itemize}
-	\item \textbf{Lokal (OLED-Display):} Ein SSD1306-OLED-Display visualisiert via I²C-Schnittstelle die aktuellen Sensordaten sowie den Betriebsstatus. 
+	\item \textbf{Lokal (OLED-Display):} Ein SSD1306-OLED-Display visualisiert via I²C-Schnittstelle die aktuellen Sensordaten sowie den Betriebsstatus.
 	\item \textbf{Remote (UART):} Für die spätere Validierung und Systemüberwachung sendet der Mikrocontroller die Temperaturwerte zyklisch über die serielle Schnittstelle (\texttt{USART1}). Die Daten werden im Format \texttt{DATA,BierTemp,WasserTemp} als CSV-kompatibler String gesendet, um ein automatisiertes Parsing am Host-PC zu gewährleisten.
 \end{itemize}
 
-% ==========================================
-% PHASE 4: Test und Validierung
-% ==========================================
-\section{Test und Validierung}
-In der finalen Phase des Wasserfall-Modells wird das integrierte Gesamtsystem validiert. Ziel dieser Phase ist es nachzuweisen, dass die in der Konzeptionsphase definierten Systemanforderungen (Requirements) durch die entwickelte Hard- und Software vollständig und fehlerfrei erfüllt werden.
+\section{Entwicklung der Validierungssoftware (Live-Monitor)}
+Um die vom Mikrocontroller gesendeten Sensordaten aufzuzeichnen und das Systemverhalten während der Testphase zu validieren, wurde eine dedizierte Host-Software in Python entwickelt. Dieses Tool fungiert als kombinierter Datenlogger und Echtzeit-Monitor. 
 
-\subsection{Testspezifikation (Test Cases)}
-Um eine systematische Überprüfung zu gewährleisten, wurden die Kernanforderungen in konkrete Testfälle (Test Cases) überführt:
-\begin{itemize}
-	\item \textbf{TC1 -- Funktionale Kühlung (vgl. ID-0001, ID-0008):} Überprüfung, ob das System in der Lage ist, die Wassertemperatur kontinuierlich zu erfassen und die Flüssigkeit im Behälter durch die Aktorik herunterzukühlen.
-	\item \textbf{TC2 -- User Interface \& Steuerung (vgl. ID-0010):} Verifizierung der verzögerungsfreien Reaktion des Systems auf Tastendrücke (Start/Stopp) sowie die korrekte Visualisierung der Zustände auf dem OLED-Display.
-	\item \textbf{TC3 -- Systemstabilität \& Logging:} Test der seriellen Datenschnittstelle über einen längeren Zeitraum. Das eigens entwickelte Python-Skript muss die zyklischen Daten und Interrupt-Marker lückenlos empfangen, parsen und grafisch darstellen.
-\end{itemize}
-
-\subsection{Integrationstests}
-Eine charakteristische Herausforderung des klassischen Wasserfall-Modells ist die späte Zusammenführung von Hardware und Software (Systemintegration). Erst in dieser Phase konnte das reale Zusammenspiel der elektronischen und programmiertechnischen Komponenten getestet werden. 
-
-Bei der Integration von Aktorik und Sensorik zeigte sich, dass die gewählte Systemarchitektur grundsätzlich äußerst robust ist. Die getrennten Spannungsdomänen (12\,V für Aktorik, 3,3\,V für die Logik) verhinderten, dass Spannungseinbrüche beim Anlaufen der Pumpe oder des Rotationsmotors den STM32-Mikrocontroller destabilisierten. Ebenso führte das hochfrequente PWM-Signal an den Leistungs-MOSFETs zu keinen messbaren Interferenzen auf der empfindlichen 1-Wire-Datenleitung der Temperatursensoren. Das Zusammenspiel zwischen der ereignisgesteuerten ISR (Taster) und der zeitkritischen Sensor-Kommunikation funktionierte dank der implementierten Entprellung fehlerfrei.
-
-Trotz dieser positiven Grundergebnisse offenbarten die Integrationstests zwei primäre Schwachstellen im experimentellen Prototypen-Aufbau:
-\begin{itemize}
-	\item \textbf{Instabile USB-Spannungsversorgung der Logikebene:} Obwohl die leistungsintensive Aktorik (Motor und Pumpe) regulär über ein externes 12V-Netzteil versorgt wird, kam es bei der gleichzeitigen Verbindung des STM32 mit einem Laptop (für Debugger und serielle Daten) wiederholt zu willkürlichen Systemstarts und -stopps. Die Schwankungen der laptopeigenen USB-Spannung reichten aus, um den empfindlichen EXTI-Pin (Taster-Interrupt) fälschlicherweise auszulösen. Beim Anschluss über eine Dockingstation mit eigener Spannungsversorgung trat dieses Fehlerbild nicht mehr auf.
-	\item \textbf{Mechanische Kontaktierung (Jumper-Kabel):} Die fliegende Verdrahtung mittels klassischer Jumper-Kabel stellte eine mechanische Schwachstelle dar. Durch Vibrationen der Aktorik kam es gelegentlich zu temporären Kontaktverlusten. Für eine Version 2.0 wäre zwingend der Umstieg auf verlötete Verbindungen oder ein dediziertes Printed Circuit Board (PCB) erforderlich.
-\end{itemize}
-
-\subsection{Testresultate und Baseline-Messung}
-
-\begin{figure}[h]
-	\centering
-	\includegraphics[width=\textwidth]{images/kuehlverlauf-bier-offen.pdf}
-	\caption{Baseline-Messung mit Thermometer im offenen, zu 2/3 gefülltem Bier}
-	\label{fig:baseline-messung}
-\end{figure}
-Zum aktuellen Zeitpunkt der Validierungsphase wurde eine erste \textit{Baseline-Messung} (Proof of Concept) durchgeführt (vgl. Abbildung~\ref{fig:baseline-messung}), um die prinzipielle Funktionalität des Kühlsystems und der Datenaufzeichnung zu verifizieren. 
-
-Aufgrund der konstruktiven Neigung des Kühlbehälters wurde dieser erste Testlauf mit einer geöffneten und lediglich zu zwei Dritteln gefüllten Flasche durchgeführt, um ein Überlaufen der Flüssigkeit während der Rotation zu verhindern. Der DS18B20-Sensor zur Messung der Biertemperatur wurde dabei direkt in die Flüssigkeit innerhalb der rotierenden Flasche eingeführt. 
-
-Diese Vorab-Messung lieferte bereits entscheidende Erkenntnisse:
+Die Architektur des Skripts (dargestellt in Abbildung \ref{fig:python_ablauf}) basiert auf drei Kernkomponenten:
 \begin{enumerate}
-	\item Das Python-basierte Datenlogging inklusive der Start-/Stopp-Marker via EXTI-Interrupt funktionierte lückenlos und lieferte valide CSV-Datensätze.
-	\item Das Kühlkonzept (Zusammenspiel aus Eiswasser-Pumpe und Flaschenrotation) bewirkte einen messbaren und kontinuierlichen Temperaturabfall in der Testflüssigkeit.
+	\item \textbf{Serielle Kommunikation:} Mittels der Bibliothek \texttt{pyserial} wird die UART-über-USB-Schnittstelle kontinuierlich ausgelesen.
+	\item \textbf{Datenprotokollierung:} Jeder empfangene Datensatz wird unmittelbar mit einem Systemzeitstempel versehen und in eine strukturierte CSV-Datei geschrieben. Um Datenverlust bei einem unerwarteten Programmabbruch zu verhindern, wird der Dateipuffer nach jeder Zeile explizit geleert (\texttt{flush()}).
+	\item \textbf{Echtzeit-Visualisierung:} Die Bibliothek \texttt{matplotlib} generiert einen dynamischen Graphen. Über die Klasse \texttt{FuncAnimation} wird das Diagramm zyklisch aktualisiert.
 \end{enumerate}
 
-Nach der erfolgreichen Bestätigung dieser Kernfunktionen (TC1 bis TC3) steht als nächster Schritt die finale Validierungsmessung mit einer vollständig geschlossenen Flasche unter realen Betriebsbedingungen an. Die dabei entstehenden Temperaturverläufe werden über das etablierte Python-Skript aufgezeichnet und dienen als abschließender Nachweis der Systemeffizienz.
+Ein besonderes Merkmal der Software ist die Verarbeitung der Hardware-Interrupts (EXTI) des STM32. Sendet der Mikrocontroller einen Status-Marker (\texttt{MARKER: START} oder \texttt{MARKER: STOP}), erkennt der Python-Parser dieses Ereignis und integriert es nicht nur in das CSV-Logbuch, sondern zeichnet in Echtzeit eine farblich codierte, vertikale Linie in das Matplotlib-Diagramm. 
 
-\subsection{Analyse der Systemdynamik und thermischen Trägheit}
-\begin{figure}[h]
+Um Performance-Einbrüche und eine hohe CPU-Auslastung bei längeren Messreihen zu vermeiden, wurde ein sogenannter \textit{Sliding-Window-Algorithmus} (gleitendes Fenster) implementiert. Der Graph zeigt stets nur die jüngsten 60 Datenpunkte (entspricht ca. zwei Minuten) an, wodurch ein kontinuierlicher Scroll-Effekt entsteht. Ältere Datenpunkte werden für das Live-Rendering ausgeblendet, bleiben jedoch lückenlos in der CSV-Datei gesichert.
+
+\begin{figure}[htbp]
 	\centering
-	\includegraphics[width=\textwidth]{images/validierung-thermometer.pdf}
-	\caption{Validierungsmessung der Thermischen Trägheit des Thermometers}
-	\label{fig:validierung-thermometer}
+	\includegraphics[width=0.9\textwidth]{images/python_ablauf.pdf} 
+	\caption{Programmablaufplan des Python-basierten Live-Datenloggers}
+	\label{fig:python_ablauf}
 \end{figure}
-Bei der Auswertung der Baseline-Messung sowie zusätzlicher Stresstests der Sensorik fiel eine zeitliche Verzögerung in der Temperaturerfassung auf. Um dieses Verhalten quantitativ zu untersuchen, wurde eine separate Kennlinie des verwendeten DS18B20-Sensors mittels direkter Hitzeeinwirkung (offene Flamme) aufgezeichnet. Die Abbildung~\ref{fig:validierung-thermometer} zeigt die Kennlinie. Die 'Bier-Temperatur' (schwarz) ist hier natürlich die Temperatur des Thermometers selbst über der Flamme.
-
-Während des Tests wurde der Sensor für 10 Sekunden einer starken Wärmequelle ausgesetzt (Intervall zwischen den Markern START und STOP). Bei Beendigung der Hitzeeinwirkung (STOP-Marker) registrierte der Sensor einen Wert von etwa 73\,°C. Anstatt sofort abzukühlen, stieg die gemessene Temperatur für weitere 11 Sekunden kontinuierlich an, bis sie ihr absolutes Maximum von 95,31\,°C erreichte.
-
-Dieser Effekt lässt sich auf die \textit{thermische Trägheit} (Wärmekapazität und Wärmewiderstand) des Sensor-Aufbaus zurückführen. Bei der verwendeten wasserdichten Variante des DS18B20 ist der eigentliche Halbleiterchip in eine Edelstahlhülse eingefasst \cite{aliexpress_ds18b20_sensor} und wahrscheinlich mit einer Vergussmasse (z.\,B. Epoxidharz) isoliert. Thermische Energie benötigt eine gewisse Zeit, um diese Materialschichten zu durchdringen, was zu der gemessenen Totzeit des Systems führt.
-
-Auch in der Baseline-Messung des Kühlwassers (vgl. Abschnitt zuvor) ist dieser Effekt sichtbar: Nach der Aktivierung der Kühlung dauert es etwa 15 Sekunden, bis der Sensor den Temperaturabfall signifikant im Datenlog abbildet. Ebenso fällt die Temperaturkennlinie nach dem Abschalten der Pumpe (STOP-Marker) zunächst noch weiter ab.
-
-\textbf{Fazit für das Gesamtsystem:}
-Für zeitkritische Regelkreise im Millisekundenbereich wäre dieser Sensor ungeeignet. Für die Anwendung in einem Getränkekühler ist diese thermische Zeitkonstante von 10 bis 15 Sekunden jedoch physikalisch vernachlässigbar. Der thermodynamische Prozess des Abkühlens einer Glasflasche mitsamt Flüssigkeit ist um ein Vielfaches langsamer als die Trägheit des Sensors, weshalb die Systemfunktion durch diesen Hardware-Effekt nicht negativ beeinträchtigt werden.
-
-\begin{figure}[h]
-	\centering
-	\includegraphics[width=\textwidth]{images/kuehlverlauf-bier-zu.pdf}
-	\caption{Finaler Testlauf des Prototyps: Die Biertemperatur wird vor Beginn und nach Abschluss des Tests gemessen}
-	\label{fig:finaler-testlauf}
-\end{figure}
-
-
-\subsection{Ergebnisse der Validierungsmessungen und Systemgrenzen}
-Zur abschließenden Validierung des Gesamtsystems wurden zwei Messreihen durchgeführt: Die bereits erwähnte Baseline-Messung mit einer geöffneten Flasche sowie ein finaler Testlauf unter realen Betriebsbedingungen mit einer vollständig geschlossenen Flasche. Die Auswertung der protokollierten CSV-Daten brachte dabei wichtige Erkenntnisse über die thermodynamischen und mechanischen Grenzen des Prototyps zutage.
-
-\subsubsection{Vergleich der Temperaturverläufe und Messmethodik}
-Bei der Betrachtung der beiden Messreihen fällt ein deutlicher methodischer Unterschied auf. In der Baseline-Messung (Abbildung~\ref{fig:baseline-messung}) (offene Flasche) befand sich der Temperatursensor während des gesamten Rotationsvorgangs direkt in der Flüssigkeit. Dies resultierte in einer kontinuierlichen, sauberen Abkühlkurve, bei der die Temperatur über einen Zeitraum von rund 5,5 Minuten von 20,31\,°C auf 12,25\,°C gesenkt werden konnte.
-
-Im realen Anwendungsfall (Abbildung~\ref{fig:finaler-testlauf}) (geschlossene Flasche) ist eine kontinuierliche Messung in der Flüssigkeit durch einen kabelgebundenen Sensor während der Rotation nicht möglich, da das Bier, aufgrund hoher Neigung sonst austreten würde. Der Sensor erfasste in diesem Zeitraum (ca. 6 Minuten Kühlzeit) lediglich die Umgebungstemperatur nahe der Flasche. Erst nach dem Stoppen der Aktorik wurde die Flasche geöffnet und der Sensor eingeführt. Dies erklärt den sprunghaften, steilen Abfall (Knick) in der Temperaturkennlinie kurz nach dem STOP-Marker. Die tatsächliche Biertemperatur fiel bei diesem Testlauf von anfänglich 18,06\,°C auf eine Endtemperatur von 13,0\,°C.
-
-\subsubsection{Analyse der Kühlleistung und Eisknappheit}
-Die erreichte Abkühlung um rund 5\,°C innerhalb von 6 Minuten bestätigt, dass das mechanische Kühlkonzept (Rotation im Wasserbad) grundsätzlich sehr gut funktioniert. Dennoch liegt die Endtemperatur von 13,0\,°C noch etwas über der idealen Trinktemperatur für ein kühles Bier.
-
-Die Ursache hierfür lag an einer Eisknappheit im Wasserreservoir während dieses letzten Testlaufs. Kaltes Wasser alleine reicht nicht aus, um eine Glasflasche in so kurzer Zeit schockzukühlen. Normalerweise entzieht das schmelzende Eis dem Bier die meiste Wärme. Da in diesem Durchlauf kaum noch Eis vorhanden war, nahm das Kühlwasser die Wärme der Flasche direkt auf und erwärmte sich relativ schnell (von 1,8\,°C beim Start auf über 5,1\,°C am Ende). Je wärmer das Wasser wird, desto schlechter kühlt es die Flasche. Mit einer ausreichenden Menge an Eiswürfeln bliebe das Wasser konstant nahe dem Gefrierpunkt, wodurch sich das Bier in der gleichen Zeit noch deutlich stärker hätte abkühlen lassen.
-
-\subsubsection{Mechanische Systemgrenzen und Verschleiß}
-Ursprünglich war geplant, den finalen Testlauf nach der Beschaffung neuer Eisreserven mit einer längeren Rotationsdauer zu wiederholen, um die Zieltemperatur zu erreichen. Dieser Plan musste jedoch aufgrund eines kritischen Hardware-Ausfalls revidiert werden. 
-
-Die Antriebswelle des 12V-Getriebemotors, welche die Kraftübertragung zur Flaschenrotation sicherstellt, erlitt durch die dynamischen Belastungen und das Drehmoment der vollen Flasche einen mechanischen Verschleiß (Abrieb der Passung). Dieser Verlust der formschlüssigen Kraftübertragung führte dazu, dass die Welle durchdrehte und keine Rotation mehr stattfand. Da eine Ersatzteilbeschaffung innerhalb des Projektzeitraums nicht mehr realisierbar war, wurden die Testreihen an diesem Punkt abgeschlossen.
-
-\textbf{Fazit der Validierung:}
-Die Validierungstests haben den "Proof of Concept" der elektronischen und softwareseitigen Systemarchitektur erfolgreich erbracht. Sensoren, PWM-Aktorik, Interrupt-Steuerung und das Python-Datenlogging funktionierten lückenlos und fehlerfrei. Für eine spätere Serienreife oder Version 2.0 des Kühlsystems müssen jedoch zwei Optimierungen vorgenommen werden: Ein größeres Eis-Reservoir zur Sicherstellung der thermodynamischen Kapazität sowie eine massivere mechanische Kupplung (z.B. aus gefrästem Aluminium oder Stahl) zur dauerhaften Kraftübertragung des Rotationsmotors.
-
-
-% ==========================================
-% PHASE 5: Projektabschluss
-% ==========================================
-% ==========================================
-% KAPITEL 5: Fazit und Ausblick
-% ==========================================
-\section{Fazit und Ausblick}
-
-\subsection{Fazit}
-Im Rahmen dieses Projektes wurde erfolgreich ein funktionsfähiger Prototyp zur automatisierten Getränkekühlung entwickelt. Der methodische Ansatz, basierend auf dem Wasserfall-Modell, ermöglichte eine strukturierte Umsetzung von der Anforderungsanalyse bis hin zum fertigen System. 
-
-Die Ergebnisse der Validierungsphase belegen, dass das elektronische und informationstechnische Fundament des Bierkühlers äußerst solide ist. Die Implementierung der Software-Architektur auf dem STM32-Mikrocontroller – bestehend aus einer Super-Loop, hardwarenahem Bit-Banging für das 1-Wire-Protokoll und ereignisgesteuerten Interrupts (EXTI) – funktionierte verzögerungsfrei und zuverlässig. Auch die eigens entwickelte Python-Host-Software zur seriellen Datenaufzeichnung und Echtzeit-Visualisierung erwies sich als wertvolles Instrument zur Systemüberwachung. Der finale Testlauf, bei dem eine geschlossene Flasche innerhalb von sechs Minuten um 5\,°C abgekühlt wurde, bestätigte den \textit{Proof of Concept} des mechanischen Rotationsprinzips im Wasserbad.
-
-Gleichzeitig deckte das Projekt wertvolle Erkenntnisse über die physikalischen und mechanischen Systemgrenzen auf. Die Limitierung durch die fehlende Schmelzenthalpie (Eisknappheit) sowie der vorzeitige mechanische Verschleiß der Motorwelle zeigten deutlich, dass bei der Skalierung vom Elektronik-Prototypen zum Serienprodukt vor allem thermodynamische und konstruktive Aspekte stärker in den Fokus rücken müssen.
-
-\subsection{Ausblick und Weiterentwicklung (Version 2.0)}
-Basierend auf den gewonnenen Erkenntnissen ergeben sich für eine zukünftige Iteration des Kühlsystems (Version 2.0) konkrete Optimierungsansätze in den Bereichen Mechanik, Elektronik und Software:
-
-\begin{itemize}
-	\item \textbf{Mechanik und Aktorik:} Der aktuell verwendete N20-Getriebemotor ist für die dauerhafte dynamische Belastung einer vollen Flasche unterdimensioniert. Ein Austausch durch einen leistungsfähigeren DC-Motor oder Schrittmotor mit einem wesentlich größeren Wellendurchmesser und einer formschlüssigen Kupplung (z.\,B. aus gefrästem Aluminium) ist zwingend erforderlich, um mechanischen Abrieb zu verhindern.
-	
-	\item \textbf{Elektronische Integration:} Um die temporären Kontaktverluste der Jumper-Kabel zu eliminieren, muss die Elektronik von der Breadboard-Ebene auf eine fest verlötete Lochrasterplatine oder idealerweise auf ein dediziertes \textit{Printed Circuit Board} (PCB) überführt werden. Dies würde auch die Störanfälligkeit bei Spannungsschwankungen weiter minimieren.
-	
-	\item \textbf{Erweitertes User Interface (Rotary Encoder):} Der aus Zeitgründen gestrichene Rotary Encoder sollte wieder in das System integriert werden. Dies würde die dynamische Einstellung einer Zieltemperatur direkt über das OLED-Display ermöglichen, ohne den Mikrocontroller neu flashen zu müssen.
-	
-	\item \textbf{Softwareseitige Flaschenprofile:} Durch die Aufnahme weiterer empirischer Messreihen könnten gerätespezifische Kühlkurven ermittelt werden. Darauf basierend ließe sich ein Menüpunkt ,,Flaschenwahl'' (z.\,B. 0,33\,L Glas, 0,5\,L Glas oder Aluminiumdose) implementieren, durch den das System die benötigte Kühldauer automatisch prädiktiv berechnet.
-	
-	\item \textbf{Aktive Kühlung (Kühlsystem-Upgrade):} Um das System von der manuellen Zugabe von Eiswürfeln unabhängig zu machen, könnte das Wasserbad mit aktiven Kühlelementen (z.\,B. leistungsstarke Peltier-Elemente mit großen Kühlkörpern oder ein Miniatur-Kompressor) ausgestattet werden. Dies würde die Autonomie und den Komfort des Geräts massiv steigern.
-	
-	\item \textbf{Regelungstechnik:} Anstelle der reinen PWM-Steuerung könnte softwareseitig ein PID-Regler (Proportional-Integral-Derivative) implementiert werden. Dieser könnte die Pumpenleistung und Rotationsgeschwindigkeit dynamisch an die Temperaturdifferenz anpassen, um die Kühlgeschwindigkeit zu maximieren und gleichzeitig die Schaumbildung bei Erreichen der Zieltemperatur sanft zu minimieren.
-\end{itemize}

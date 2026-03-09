@@ -1,0 +1,64 @@
+\chapter{Fazit und Ausblick}
+\label{cha:fazit}
+
+\section{Fazit}
+Im Rahmen dieses Projektes wurde erfolgreich ein funktionsfähiger Prototyp zur automatisierten Getränkekühlung entwickelt. Der methodische Ansatz, basierend auf dem Wasserfall-Modell, ermöglichte eine strukturierte Umsetzung von der Anforderungsanalyse bis hin zum fertigen System. 
+
+Die Ergebnisse der Validierungsphase belegen, dass das elektronische und informationstechnische Fundament des Bierkühlers äußerst solide ist. Die Implementierung der Software-Architektur auf dem STM32-Mikrocontroller – bestehend aus einer Super-Loop, hardwarenahem Bit-Banging für das 1-Wire-Protokoll und ereignisgesteuerten Interrupts (EXTI) – funktionierte verzögerungsfrei und zuverlässig. Auch die eigens entwickelte Python-Host-Software zur seriellen Datenaufzeichnung und Echtzeit-Visualisierung erwies sich als wertvolles Instrument zur Systemüberwachung. Der finale Testlauf, bei dem eine geschlossene Flasche innerhalb von sechs Minuten um 5\,°C abgekühlt wurde, bestätigte den \textit{Proof of Concept} des mechanischen Rotationsprinzips im Wasserbad.
+
+\section{Kritische Reflexion und Lessons Learned}
+Trotz der erfolgreichen technischen Umsetzung offenbarte der Projektverlauf sowohl methodische als auch konstruktive Schwächen, die zu einer signifikanten Verkürzung der finalen Validierungsphase führten. Eine retrospektive Analyse identifiziert die wesentlichen Problemfelder, die den Entwicklungsprozess ineffizient gestalteten, und liefert wertvolle Erkenntnisse für zukünftige Iterationen.
+
+\subsection{Prozessmanagement und Softwareentwicklung}
+\begin{enumerate}
+	\item \textbf{Projektmanagement und Methodik:} 
+	Die Entscheidung für das klassische Wasserfallmodell fiel primär aus Gründen der vermeintlich geringeren administrativen Komplexität und weniger aufgrund einer Eignungsprüfung für das vorliegende Projekt. Dies förderte eine streng sequentielle Arbeitsweise ('Silo-Denken'), bei der Arbeitspakete ohne inhaltliche Überschneidungen weitergereicht wurden. Die fehlende Parallelisierung von Aufgaben führte zu erheblichen Ressourcenleerläufen und Reibungsverlusten im Team. Die Erkenntnis hieraus ist, dass ein proaktives Projekt- und Qualitätsmanagement essenziell ist, um Entwicklungsphasen zu synchronisieren und Motivationstiefs zu vermeiden.
+	
+	\item \textbf{Beschaffungs- und Konfigurationsmanagement:} 
+	Ein kritischer Fehler in der Materialbeschaffung führte zu massiven Verzögerungen in der Softwareentwicklung. Der Plan, mehrere Prototypen parallel zu fertigen, erforderte die Nachbestellung weiterer Mikrocontroller. Unter der falschen Prämisse, dass es sich dabei exakt um dasselbe Modell (STM32F030) wie beim initialen Referenzboard handelte, wurden Derivate einer leistungsstärkeren, aber architektonisch abweichenden Baureihe (STM32F103) beschafft. Da die Artikelbeschreibung nicht ausreichend geprüft wurde, blieb diese Hardware-Diskrepanz zunächst unbemerkt und führte zu zwei gravierenden Problemen im Entwicklungsablauf:
+	\begin{itemize}
+		\item \textit{Fehlgeleitetes Debugging:} Da die Inkompatibilität der Hardware nicht bekannt war, versuchte das Team über mehrere Wochen hinweg, die für den STM32F030 geschriebene Software auf den neuen Platinen zum Laufen zu bringen. Die Fehleranalyse fokussierte sich dabei fälschlicherweise ausschließlich auf vermeintliche Logik- und Konfigurationsfehler im eigenen Code. Diese systematische Fehlersuche an der falschen Stelle resultierte in einer enormen und vermeidbaren Zeitverschwendung.
+		\item \textit{Systeminstabilitäten durch Registerzugriffe:} Nachdem der Hardware-Irrtum schließlich identifiziert wurde, migrierte das Team die Software-Architektur auf den STM32F103, um die neu beschafften Platinen nutzen zu können. Obwohl das System anfänglich funktionierte, traten im weiteren Verlauf kritische Hardware-Ausfälle auf, bei denen die Mikrocontroller vorerst ihre Funktion einstellten. Erst nach neuem Beschreiben mit anderer Software funktionierten sie wieder. Laut ihrer Analyse handelte es sich dabei um falsch beschriebene Register.
+	\end{itemize}
+	Aufgrund dieser schwerwiegenden Komplikationen und der fehlenden Gewissheit über die exakte Ursache der Registerausfälle sah sich das Team gezwungen, das Vorhaben der Serienproduktion zu verwerfen und wieder auf das ursprüngliche STM32F030-Referenzmodell zurückzuwechseln. Die erneute Rückmigration der Codebasis konnte in der Zwischenzeit zwar durch den Einsatz KI-gestützter Werkzeuge stark beschleunigt werden, verdeutlichte aber abermals die massiven prozessualen Auswirkungen eines unzureichenden Hardware- und Konfigurationsmanagements.
+	
+	\item \textbf{Verfrühte Systemintegration und mangelnde Modularität:} 
+	Ein weiterer prozessualer Fehler bestand in der vorzeitigen finalen Verdrahtung und Montage der Hardware, noch bevor die Software validiert und die Mikrocontroller-Thematik geklärt war. Der Prototyp wurde nicht ausreichend modular konzipiert. Die darauffolgenden, zwangsläufigen Hardware-Eingriffe und das ständige Austauschen des Mikrocontrollers führten zu mechanischen Belastungen, gelösten Lötstellen und einem insgesamt stark erschwerten Debugging-Prozess.
+\end{enumerate}
+
+\subsection{Mechanischer Aufbau und Konstruktion}
+Auch im Bereich des 3D-Drucks und der Mechanik mussten Annahmen revidiert und konstruktive Anpassungen vorgenommen werden:
+\begin{itemize}
+	\item \textbf{Materialeigenschaften und Dichtigkeit:} Die Annahme, dass 3D-Druckteile von Natur aus wasserdicht sind, bestätigte sich nicht unmittelbar. Die Erfahrung zeigte, dass nicht nur die Materialwahl (PLA vs. PETG), sondern primär die Wandstärke und die Anzahl der Perimeter (Außenlinien) im Slicer entscheidend für die hydrostatische Dichtigkeit sind.
+	\item \textbf{Reibung und Kraftübertragung:} Die anfängliche Problematik der durchdrehenden Wellen verdeutlichte, dass bei glatten Oberflächen (Kunststoff auf Glas) im Nassbereich die mechanische Reibung oft überschätzt wird. Die Integration von Gummidichtungsringen als Haftvermittler stellte eine einfache, aber effektive mechanische Lösung dar.
+	\item \textbf{Schnittstellenmanagement und Motoraufnahme:} Die größte mechanische Herausforderung war die passgenaue Ausrichtung des Motors zur Welle („Balkon-Konstruktion“). Aufgrund der hohen Kraft, die der Motor benötigt, um die Bierflasche zu drehen, kam es während der Tests zu mechanischen Ausfällen und dem Ausreißen der Welle. Versuche, die Motorwelle mit Sekundenkleber zu fixieren, brachten keinen dauerhaften Erfolg. Eine formschlüssigere Lösung (z.\,B. durch das direkte Einschmelzen der Metallwelle in den Kunststoff) oder die Wahl eines Motors mit einer robusteren Aufnahme sind hier essenziell.
+	\item \textbf{Getriebeübersetzung vs. Softwaresteuerung:} Die Anpassung der Drehzahl zeigte den klassischen Zielkonflikt zwischen Mechanik und Elektronik. Während eine mechanische Reduktion (Verkleinerung des Wellendurchmessers) das Drehmoment unberührt lässt, bietet die Ansteuerung via PWM eine höhere Flexibilität, erfordert jedoch eine robustere mechanische Kopplung, um die auftretenden Kräfte dauerhaft zu übertragen.
+	\item \textbf{Montagefreundlichkeit:} Das Einbringen von Einschmelzgewinden (M3) hat sich gegenüber dem direkten Verschrauben in Kunststoff als deutlich überlegen erwiesen, da es mehrfache Demontagen zu Wartungszwecken erlaubt, ohne das Material zu verschleißen.
+\end{itemize}
+
+\section{Präventive Ansätze für zukünftige Entwicklungszyklen}
+Um die identifizierten Fehlerquellen in zukünftigen Projekten oder einer potenziellen Serienreife (Version 2.0) zu vermeiden, sollten folgende methodische und technische Herangehensweisen etabliert werden:
+
+\begin{itemize}
+	\item \textbf{Anwendung iterativer Vorgehensmodelle:} Anstelle des starren Wasserfallmodells sollte das V-Modell oder ein agiler Ansatz (z.\,B. Scrum) gewählt werden. Dies erzwingt regelmäßige Synchronisationspunkte (Stand-ups) im Team, ermöglicht eine parallele Entwicklung von Hard- und Software und deckt Integrationsprobleme frühzeitig ab.
+	\item \textbf{Striktes Wareneingangs- und Konfigurationsmanagement:} Vor Entwicklungsbeginn muss ein Abgleich zwischen bestellter und gelieferter Hardware (Part-Nummern, Datenblätter) erfolgen. Die Software sollte zudem modular über Hardware Abstraction Layers (HAL) aufgebaut werden, um Portierungen zwischen verschiedenen Mikrocontroller-Derivaten fehlerfrei zu ermöglichen.
+	\item \textbf{Modularer Prototypenbau (Hardware-in-the-Loop):} Die physische Festverdrahtung oder das Verlöten von Komponenten darf erst erfolgen, wenn die Software-Basis in einer offenen Breadboard- oder Testumgebung (Evaluierungsboard) vollständig validiert wurde. Alternativ sind standardisierte Steckverbinder (z.\,B. JST-Stecker) anstelle direkter Lötverbindungen zu verwenden.
+	\item \textbf{Kontinuierliche Systemintegration (Continuous Integration):} Hard- und Software sollten schrittweise und nicht erst am Ende des Projekts zusammengeführt werden. Einzelne Module (z.\,B. Motorsteuerung, Sensorauslesung) müssen isoliert getestet und erst bei erfolgreicher Validierung in das Gesamtsystem integriert werden.
+\end{itemize}
+
+\section{Ausblick und Weiterentwicklung (Version 2.0)}
+Basierend auf den gewonnenen Erkenntnissen ergeben sich für eine zukünftige Iteration des Kühlsystems (Version 2.0) konkrete Optimierungsansätze in den Bereichen Mechanik, Elektronik und Software:
+
+\begin{itemize}
+	\item \textbf{Mechanik und Aktorik:} Der aktuell verwendete N20-Getriebemotor ist für die dauerhafte dynamische Belastung einer vollen Flasche unterdimensioniert. Ein Austausch durch einen leistungsfähigeren DC-Motor oder Schrittmotor mit einem wesentlich größeren Wellendurchmesser und einer formschlüssigen Kupplung (z.\,B. aus gefrästem Aluminium) ist zwingend erforderlich, um mechanischen Abrieb zu verhindern.
+	
+	\item \textbf{Elektronische Integration:} Um die temporären Kontaktverluste der Jumper-Kabel zu eliminieren, muss die Elektronik von der Breadboard-Ebene auf eine fest verlötete Lochrasterplatine oder idealerweise auf ein dediziertes \textit{Printed Circuit Board} (PCB) überführt werden. Dies würde auch die Störanfälligkeit bei Spannungsschwankungen weiter minimieren.
+	
+	\item \textbf{Erweitertes User Interface (Rotary Encoder):} Der aus Zeitgründen gestrichene Rotary Encoder sollte wieder in das System integriert werden. Dies würde die dynamische Einstellung einer Zieltemperatur direkt über das OLED-Display ermöglichen, ohne den Mikrocontroller neu flashen zu müssen.
+	
+	\item \textbf{Softwareseitige Flaschenprofile:} Durch die Aufnahme weiterer empirischer Messreihen könnten gerätespezifische Kühlkurven ermittelt werden. Darauf basierend ließe sich ein Menüpunkt ,,Flaschenwahl'' (z.\,B. 0,33\,L Glas, 0,5\,L Glas oder Aluminiumdose) implementieren, durch den das System die benötigte Kühldauer automatisch prädiktiv berechnet.
+	
+	\item \textbf{Aktive Kühlung (Kühlsystem-Upgrade):} Um das System von der manuellen Zugabe von Eiswürfeln unabhängig zu machen, könnte das Wasserbad mit aktiven Kühlelementen (z.\,B. leistungsstarke Peltier-Elemente mit großen Kühlkörpern oder ein Miniatur-Kompressor) ausgestattet werden. Dies würde die Autonomie und den Komfort des Geräts massiv steigern.
+	
+	\item \textbf{Regelungstechnik:} Anstelle der reinen PWM-Steuerung könnte softwareseitig ein PID-Regler (Proportional-Integral-Derivative) implementiert werden. Dieser könnte die Pumpenleistung und Rotationsgeschwindigkeit dynamisch an die Temperaturdifferenz anpassen, um die Kühlgeschwindigkeit zu maximieren und gleichzeitig die Schaumbildung bei Erreichen der Zieltemperatur sanft zu minimieren.
+\end{itemize}

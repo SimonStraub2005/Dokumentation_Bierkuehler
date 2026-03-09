@@ -1,0 +1,76 @@
+\chapter{Software-Entwurf und Implementierung}
+\label{cha:software}
+
+Nach Abschluss der Hardware-Planung erfolgte die Entwicklung der Systemsoftware. Die Programmierung des STM32F030C8T6 wurde in C unter Verwendung der STM32CubeIDE und der Hardware Abstraction Layer (HAL) Bibliothek von STMicroelectronics umgesetzt. Der Fokus lag auf einer ressourcenschonenden und blockierungsfreien Ausführung der Kernprozesse.
+
+\section{Software-Architektur und Programmablauf}
+Die grundlegende Architektur der Software basiert auf einer klaren Trennung zwischen kontinuierlichen Hintergrundprozessen (\textit{Super-Loop}) und ereignisgesteuerten Nutzereingaben (Interrupts). Das System operiert in einer vereinfachten Zustandsmaschine (State Machine) mit zwei Hauptzuständen, die über die globale Flag-Variable \texttt{system\_laeuft} gesteuert werden:
+
+\begin{enumerate}
+	\item \textbf{Zustand 1 (Kühlen):} Motoren und Pumpe sind aktiv (PWM eingeschaltet). Temperaturen werden zyklisch gemessen, das OLED-Display aktualisiert und Datenpakete via UART gesendet.
+	\item \textbf{Zustand 2 (Pause):} Aktorik ist gestoppt (PWM abgeschaltet). Die Temperaturmessung und Datenübertragung laufen zur lückenlosen Überwachung im Hintergrund weiter.
+\end{enumerate}
+
+Um eine detaillierte und gut lesbare Darstellung des Software-Designs zu gewährleisten, wurde das Programmablauf-Diagramm logisch in die zyklische Main-Loop (Abbildung \ref{fig:main_loop}) und die asynchrone Interrupt Service Routine (Abbildung \ref{fig:isr}) unterteilt.
+
+\subsection{Ablauf der Main-Loop}
+Die Main-Loop steuert den zyklischen Hauptablauf des Systems. Nach der initialen Konfiguration der Hardware-Peripherie tritt der Mikrocontroller in die Endlosschleife (\texttt{while(1)}) ein. Hier werden bei jedem Durchlauf zunächst die \texttt{MARKER}-Flags ausgewertet, um bei Zustandsänderungen entsprechende UART-Signale an den Host-PC zu senden. Anschließend erfolgt die Temperaturmessung beider Sensoren, gefolgt von der Aktualisierung des OLED-Displays und dem seriellen Datenversand.
+
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=0.39\textwidth]{images/main_loop.pdf} 
+	\caption{Programmablaufplan der zyklischen Main-Loop}
+	\label{fig:main_loop}
+\end{figure}
+
+\subsection{Ereignisgesteuerte Benutzereingabe und Interrupt Service Routine (ISR)}
+Anstatt den Zustand des UI-Tasters zyklisch in der Main-Loop abzufragen (Polling), wurde der entsprechende GPIO-Pin hardwareseitig mit einem externen Interrupt (EXTI Line 0) belegt. Löst der Taster eine fallende Flanke aus, unterbricht der Mikrocontroller die Main-Loop sofort und springt in die asynchrone Interrupt Service Routine (ISR), die in Abbildung \ref{fig:isr} dargestellt ist.
+
+Diese Routine arbeitet unabhängig vom Hauptzyklus und ist ausschließlich für die unmittelbare Verarbeitung der Benutzereingaben über die \texttt{HAL\_GPIO\_EXTI\_Callback()}-Funktion zuständig. Da mechanische Taster beim Drücken oft mehrfach den Kontakt schließen (Prellen), wurde in der Software eine \textit{Entprellung} (Debouncing) implementiert. Durch den Abgleich mit der System-Tick-Zeit (\texttt{HAL\_GetTick()}) werden aufeinanderfolgende Hardware-Interrupts innerhalb von 200\,ms ignoriert, sodass nur der erste, bewusste Tastendruck registriert wird. 
+
+Bei einem validierten Signal schaltet die ISR den Systemzustand um (Starten oder Stoppen der PWM-Aktorik) und setzt das entsprechende Marker-Flag für den nächsten Durchlauf der Main-Loop. Danach kehrt der Mikrocontroller nahtlos an die zuvor unterbrochene Stelle im Hauptzyklus zurück.
+
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=0.7\textwidth]{images/isr.pdf} 
+	\caption{Logik der Interrupt Service Routine (EXTI) zur Systemsteuerung}
+	\label{fig:isr}
+\end{figure}
+
+\section{Implementierung der Schnittstellen und Peripherie}
+
+\subsection{Temperaturerfassung via 1-Wire-Protokoll}
+Eine technische Herausforderung bestand in der softwareseitigen Implementierung des 1-Wire-Protokolls (Bit-Banging) für die digitalen Sensoren DS18B20. Da das Protokoll strikte Timing-Vorgaben im Mikrosekundenbereich fordert, reicht die standardmäßige \texttt{HAL\_Delay()}-Funktion (welche im Millisekundenbereich arbeitet) nicht aus. Zur Lösung dieses Problems wurde der Hardware-Timer \texttt{TIM6} als hochpräziser Mikrosekunden-Zähler konfiguriert.
+
+Um die Performance der Main-Loop zu optimieren, werden beide Sensoren parallel ausgelesen: Beide DS18B20 erhalten sequenziell den Befehl zur Temperaturkonvertierung (\texttt{0x44}). Anschließend pausiert der Mikrocontroller für die vom Datenblatt \cite{ds18b20_datasheet} geforderten 800\,ms, während \textit{beide} Sensoren intern messen. Dieses Vorgehen halbiert die Blockierungszeit der Main-Loop im Vergleich zum seriellen Auslesen.
+
+\subsection{PWM-Steuerung der Aktorik}
+Zur Erfüllung der Anforderung ID-0003 (Verhinderung von übermäßigem Schäumen) werden die 12V-Aktoren stufenlos betrieben. Hierfür wurden die Timer \texttt{TIM3} und \texttt{TIM15} im PWM-Modus konfiguriert. Über die Einstellung des Duty-Cycles (Tastgrads) in den jeweiligen Compare-Registern lässt sich die Durchschnittsspannung an den Gates der Leistungs-MOSFETs und damit die Drehzahl von Motor und Pumpe exakt justieren.
+
+\subsection{User Interface und Datenlogging}
+Die Ausgabe der Systemdaten erfolgt zweigleisig:
+\begin{itemize}
+	\item \textbf{Lokal (OLED-Display):} Ein SSD1306-OLED-Display visualisiert via I²C-Schnittstelle die aktuellen Sensordaten sowie den Betriebsstatus.
+	\item \textbf{Remote (UART):} Für die spätere Validierung und Systemüberwachung sendet der Mikrocontroller die Temperaturwerte zyklisch über die serielle Schnittstelle (\texttt{USART1}). Die Daten werden im Format \texttt{DATA,BierTemp,WasserTemp} als CSV-kompatibler String gesendet, um ein automatisiertes Parsing am Host-PC zu gewährleisten.
+\end{itemize}
+
+\section{Entwicklung der Validierungssoftware (Live-Monitor)}
+Um die vom Mikrocontroller gesendeten Sensordaten aufzuzeichnen und das Systemverhalten während der Testphase zu validieren, wurde eine dedizierte Host-Software in Python entwickelt. Dieses Tool fungiert als kombinierter Datenlogger und Echtzeit-Monitor. 
+
+Die Architektur des Skripts (dargestellt in Abbildung \ref{fig:python_ablauf}) basiert auf drei Kernkomponenten:
+\begin{enumerate}
+	\item \textbf{Serielle Kommunikation:} Mittels der Bibliothek \texttt{pyserial} wird die UART-über-USB-Schnittstelle kontinuierlich ausgelesen.
+	\item \textbf{Datenprotokollierung:} Jeder empfangene Datensatz wird unmittelbar mit einem Systemzeitstempel versehen und in eine strukturierte CSV-Datei geschrieben. Um Datenverlust bei einem unerwarteten Programmabbruch zu verhindern, wird der Dateipuffer nach jeder Zeile explizit geleert (\texttt{flush()}).
+	\item \textbf{Echtzeit-Visualisierung:} Die Bibliothek \texttt{matplotlib} generiert einen dynamischen Graphen. Über die Klasse \texttt{FuncAnimation} wird das Diagramm zyklisch aktualisiert.
+\end{enumerate}
+
+Ein besonderes Merkmal der Software ist die Verarbeitung der Hardware-Interrupts (EXTI) des STM32. Sendet der Mikrocontroller einen Status-Marker (\texttt{MARKER: START} oder \texttt{MARKER: STOP}), erkennt der Python-Parser dieses Ereignis und integriert es nicht nur in das CSV-Logbuch, sondern zeichnet in Echtzeit eine farblich codierte, vertikale Linie in das Matplotlib-Diagramm. 
+
+Um Performance-Einbrüche und eine hohe CPU-Auslastung bei längeren Messreihen zu vermeiden, wurde ein sogenannter \textit{Sliding-Window-Algorithmus} (gleitendes Fenster) implementiert. Der Graph zeigt stets nur die jüngsten 60 Datenpunkte (entspricht ca. zwei Minuten) an, wodurch ein kontinuierlicher Scroll-Effekt entsteht. Ältere Datenpunkte werden für das Live-Rendering ausgeblendet, bleiben jedoch lückenlos in der CSV-Datei gesichert.
+
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=0.9\textwidth]{images/python_ablauf.pdf} 
+	\caption{Programmablaufplan des Python-basierten Live-Datenloggers}
+	\label{fig:python_ablauf}
+\end{figure}

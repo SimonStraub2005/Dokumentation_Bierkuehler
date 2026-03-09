@@ -18,6 +18,7 @@ ngerman
 \usepackage[setspace=false]{scrhack}
 \usepackage[utf8]{inputenc} 	% ermöglicht die direkte Eingabe von Umlauten
 \usepackage[T1]{fontenc} 		% Ausgabe aller zeichen in einer T1-Codierung (wichtig für die Ausgabe von Umlauten!)
+\usepackage{tabularx}
 \usepackage{babel} 	% deutsche Trennungsregeln und Übersetzung der festcodierten Überschriften
 \renewcaptionname{ngerman}{\contentsname}{Inhaltsverzeichnis}
 \renewcaptionname{ngerman}{\bibname}{Quellenverzeichnis}
@@ -238,12 +239,12 @@ acronym,
 
 \include{chapter/einleitung}
 \include{chapter/grundlagen}
-\include{chapter/schaltplan}
+\include{chapter/anforderungsanalyse}
 \include{chapter/konstruktion}
+\include{chapter/hardware}
 \include{chapter/software}
-\include{chapter/lessons_learned}
-\include{chapter/tests}
-\include{chapter/zusammenfassung}
+\include{chapter/validierung}
+\include{chapter/fazit}
 
 % ---- Literaturverzeichnis ----------
 \interlinepenalty 10000					% Verhindert einen Umbruch mitten in Literatureinträgen
@@ -342,7 +343,7 @@ type=main]
 
 %\renewcommand{\indexname}{Sachwortverzeichnis}
 %\addcontentsline{toc}{chapter}{\indexname}
-\printindex								% Erzeugen des Sachwortverzeichnisses
+%\printindex								% Erzeugen des Sachwortverzeichnisses
 %\ifthenelse{\boolean{@twoside}}{%
 %	\cleardoubleoddpage
 %}{%

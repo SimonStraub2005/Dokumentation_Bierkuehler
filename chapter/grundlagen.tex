@@ -2,52 +2,32 @@
 \label{cha:Grundlagen des Kühlmechanismus}
 
 \section{Grundlagen des Kühlmechanismus}
+Um zu verstehen, warum unser Bierkühler so schnell funktioniert, müssen wir uns kurz ansehen, wie Wärme überhaupt übertragen wird. Beim Abkühlen von Getränken spielen im Wesentlichen zwei physikalische Effekte eine Rolle: die Wärmeleitung (Transport von Wärme durch ein Material) und die Konvektion (Wärmetransport durch Strömung). Die Wärmestrahlung kann für unser System vernachlässigt werden.
 
-Um die Funktionsweise des entwickelten Bierkühlers vollständig zu verstehen, werden zunächst die physikalischen Grundlagen der Wärmeübertragung betrachtet. Der Kühlprozess basiert im Wesentlichen auf den Mechanismen der Wärmeleitung, der Konvektion sowie – in deutlich geringerem Maße – der Wärmestrahlung. Für das vorliegende System sind insbesondere Wärmeleitung und Konvektion entscheidend.
-
-\subsection{Wärmeübertragung beim statischen Kühlen}
-
-Wird eine Bierflasche in ein kaltes Wasserbad gestellt, läuft der Kühlprozess in mehreren Schritten ab:
-
+\subsection{Das Problem beim normalen Kühlen}
+Stellt man eine Flasche Bier einfach nur ruhend in ein kaltes Wasserbad, läuft die Wärmeübertragung in drei Schritten ab:
 \begin{enumerate}
-	\item \textbf{Wärmeleitung im Inneren der Flasche} \\
-	Das wärmere Bier gibt Wärme an die innere Glaswand der Flasche ab.
-	
-	\item \textbf{Wärmeleitung durch das Glas} \\
-	Die Wärme wird durch die Glaswand nach außen transportiert.
-	
-	\item \textbf{Wärmeübergang an das Kühlwasser} \\
-	Die äußere Glasoberfläche gibt die Wärme an das umgebende Wasser ab.
+	\item Das warme Bier im Inneren gibt seine Wärme an die innere Glaswand ab.
+	\item Das Glas leitet diese Wärme nach außen durch.
+	\item Die Außenseite der Flasche gibt die Wärme schließlich an das kalte Wasser ab.
 \end{enumerate}
 
+Das Problem bei dieser Methode: Das Bier direkt an der Glaswand kühlt zwar schnell ab, bleibt dort aber stehen, da sich die Flüssigkeit nicht bewegt. Es bildet sich eine sogenannte \textit{isolierende Grenzschicht} \cite[vgl. S. 311 f.]{baehr2006}. Da das kalte, dichtere Bier am Rand bleibt und der warme Kern in der Mitte isoliert wird, verläuft der weitere Wärmetransport nur noch sehr langsam.
 
+\subsection{Die Lösung: Erzwungene Konvektion}
+Unser entwickelter Bierkühler verhindert genau diese isolierende Grenzschicht, indem die Flasche durch einen Motor kontinuierlich gedreht wird. Durch die permanente Rotation wird das Bier im Inneren ständig durchgemischt. 
 
-\begin{center}
-	Bierkern $\rightarrow$ Glaswand $\rightarrow$ Kühlwasser $\rightarrow$ Umgebung
-\end{center}
+Dieser physikalische Vorgang wird \textit{erzwungene Konvektion} genannt, da die Strömung aktiv durch eine Maschine erzeugt wird. Das warme Bier aus der Flaschenmitte wird immer wieder an das kalte Glas gespült, während das bereits abgekühlte Bier nach innen wandert. Dadurch bleibt der Temperaturunterschied an der Flaschenwand immer maximal, der Wärmestrom reißt nicht ab und das Bier kühlt in einem Bruchteil der normalen Zeit herunter.
 
-
-Zunächst kühlt sich das Bier in unmittelbarer Nähe zur Innenwand ab. Es bildet sich eine sogenannte \textit{thermische Grenzschicht}. Diese besteht aus bereits abgekühlter Flüssigkeit, die zwischen der Glaswand und dem noch wärmeren Flüssigkeitskern liegt.
-
-Da Flüssigkeiten ohne Bewegung Wärme nur durch molekulare Wärmeleitung übertragen, verläuft der Wärmetransport vom warmen Kern zur gekühlten Randzone relativ langsam. Die Grenzschicht wirkt daher isolierend und reduziert den weiteren Wärmefluss. Sie entsteht durch die ungleichmäßige Temperaturverteilung im Inneren der Flüssigkeit. Das kühlere, dichtere Bier verbleibt zunächst in Wandnähe, während der wärmere Kern erstmals noch warm bleibt.
-
-
-\subsection{Prinzip der erzwungenen Konvektion}
-
-Der entwickelte Bierkühler verhindert die Ausbildung einer stabilen Grenzschicht, indem er das Bier kontinuierlich in Rotation versetzt. Durch diese Bewegung wird die Flüssigkeit permanent durchgemischt.
-
-Dieser Prozess wird als \textit{erzwungene Konvektion} bezeichnet. Im Gegensatz zur natürlichen Konvektion wird die Strömung hier aktiv durch eine mechanische Kraft erzeugt – im vorliegenden System durch Motor, Welle und Steuerungseinheit in Form des Mikrocontrollers.
-
-Die Rotation sorgt für eine kontinuierliche Zerstörung der thermischen Grenzschicht und fördern den Transport vom warmen Bier zur Glaswand und vom kühlen Bier vom Rand ins innere. Der Temperaturgradient an der Wand bleibt somit groß, sodass der Wärmestrom aufrechterhalten wird.
-
-
-\subsection{Einflussfaktoren auf die Kühlleistung}
-
-Die Effizienz des Systems hängt von der Drehzahl der Rotation, der Temperatur des Kühlwassers, der Wassermenge, dem Material und Wandstärke der Flasche und der Anfangstemperatur des Bieres ab.
-
-Eine höhere Drehzahl verbessert die Durchmischung und erhöht den Wärmeübergangskoeffizienten. Allerdings muss die Drehzahl so gewählt werden, dass keine übermäßige Schaumbildung oder mechanische Belastung der Flasche entsteht. Kühleres Wasser fördert die schnelle Kühlung, mehr Wasser fördert auch die schnelle Kühlung, ist der Wasserspiegel jedoch zu hoch, bringt die Kühlung jedoch nichts, da die \textit{erzwungene Konvektion} bei zu viel Wasser nutzlos ist. Eine dickere Wand ist ebenso wie die Anfangstemperatur kontraproduktiv und verlangsamt die Kühlung.
+\subsection{Was beeinflusst die Kühlgeschwindigkeit?}
+Die tatsächliche Effizienz des Kühlsystems hängt von mehreren Faktoren ab:
+\begin{itemize}
+	\item \textbf{Drehzahl:} Je schneller sich die Flasche dreht, desto besser wird das Bier durchmischt und gekühlt. Dreht sie sich jedoch zu schnell, wird das Getränk zu stark geschüttelt, schäumt beim Öffnen über oder belastet die Mechanik zu stark.
+	\item \textbf{Kühlwasser:} Je kälter das Wasser ist und je mehr kühles Wasser kontinuierlich an der Flasche anliegt, desto schneller wird die Wärme abtransportiert. Ein zu hoher Wasserstand im Behälter kann die erzwungene Konvektion jedoch stören, weshalb der Füllstand ausbalanciert sein muss.
+	\item \textbf{Flaschenbeschaffenheit und Starttemperatur:} Eine dicke Glaswand leitet die Wärme schlechter nach außen als beispielsweise eine dünne Aluminiumdose \cite[vgl. S. 132]{baehr2006}. Zudem dauert der Prozess natürlich länger, je wärmer das Bier zu Beginn ist.
+\end{itemize}
 
 \subsection{Ableitung für die Systementwicklung}
-Zusammenfassend lässt sich festhalten, dass die theoretischen Grundlagen der Thermodynamik den direkten Rahmen für die technische Umsetzung vorgeben. Um das physikalische Potenzial der erzwungenen Konvektion optimal auszunutzen, muss das zu entwickelnde System in der Lage sein, Kernparameter wie die Rotationsgeschwindigkeit und die kontinuierliche Benetzung mit Kühlwasser präzise zu steuern. 
+Aus diesen theoretischen Grundlagen leiten sich direkt die praktischen Aufgaben für unsere technische Umsetzung ab. Um den Kühlprozess optimal zu beschleunigen, muss unser System die Flasche kontinuierlich mit Kühlwasser benetzen und sie in der perfekten Geschwindigkeit drehen. 
 
-Gleichzeitig dürfen physikalische Grenzen (wie die übermäßige Schaumbildung bei zu hoher Drehzahl) nicht überschritten werden. Aus diesen physikalischen Notwendigkeiten sowie dem praktischen Einsatzzweck des Geräts leiten sich unmittelbar die konkreten Hard- und Softwareanforderungen an den Prototyp ab, welche im folgenden Kapitel systematisch erfasst und definiert werden.
+Gleichzeitig müssen wir durch eine präzise, elektronische Steuerung verhindern, dass sich die Flasche zu schnell dreht und das Bier schäumt. Aus diesen physikalischen Anforderungen haben wir im nächsten Schritt die konkreten Vorgaben für die Mechanik, die Hardware und die Software unseres Prototyps abgeleitet, welche im folgenden Kapitel definiert werden.

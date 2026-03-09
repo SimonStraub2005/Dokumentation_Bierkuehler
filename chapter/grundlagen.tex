@@ -1,52 +1,28 @@
 \chapter{Grundlagen}
-\label{cha:Grundlagen des Kühlmechanismus}
+\label{cha:Grundlagen}
 
-\section{Grundlagen des Kühlmechanismus}
+\section{Physikalische Grundlagen des Kühlmechanismus}
+Der Kühlprozess basiert auf den Mechanismen der Wärmeleitung und der Konvektion[cite: 11, 14].
 
-Um die Funktionsweise des entwickelten Bierkühlers vollständig zu verstehen, werden zunächst die physikalischen Grundlagen der Wärmeübertragung betrachtet. Der Kühlprozess basiert im Wesentlichen auf den Mechanismen der Wärmeleitung, die wir uns nun zunächst beim statischen kühlen ansehen. 
-
-\subsection{Wärmeübertragung beim statischen Kühlen}
-
-Wird eine Bierflasche in ein kaltes Wasserbad gestellt, läuft der Kühlprozess in mehreren Schritten ab:
-
-\begin{enumerate}
-	\item \textbf{Wärmeleitung im Inneren der Flasche} \\
-	Das wärmere Bier gibt Wärme an die innere Glaswand der Flasche ab.
-	
-	\item \textbf{Wärmeleitung durch das Glas} \\
-	Die Wärme wird durch die Glaswand nach außen transportiert.
-	
-	\item \textbf{Wärmeübergang an das Kühlwasser} \\
-	Die äußere Glasoberfläche gibt die Wärme an das umgebende Wasser ab.
-\end{enumerate}
-
-
-
-\begin{center}
-	Bierkern $\rightarrow$ Glaswand $\rightarrow$ Kühlwasser $\rightarrow$ Umgebung
-\end{center}
-
-
-Zunächst kühlt sich das Bier in unmittelbarer Nähe zur Innenwand ab. Es bildet sich eine sogenannte \textit{thermische Grenzschicht}. Diese besteht aus bereits abgekühlter Flüssigkeit, die zwischen der Glaswand und dem noch wärmeren Flüssigkeitskern liegt.
-
-Da Flüssigkeiten ohne Bewegung Wärme nur durch molekulare Wärmeleitung übertragen, verläuft der Wärmetransport vom warmen Kern (Flaschenmitte) zur gekühlten Randzone relativ langsam. Die Grenzschicht wirkt daher isolierend und reduziert den weiteren Wärmefluss. Sie entsteht durch die ungleichmäßige Temperaturverteilung im Inneren der Flüssigkeit. Das kühlere, dichtere Bier verbleibt zunächst in Wandnähe, während der wärmere Kern erstmals auch noch warm bleibt.
-
+\subsection{Problematik beim statischen Kühlen}
+Beim Kühlen einer ruhenden Flasche (z. B. im Wasserbad) wandert die Wärme vom Bierkern durch die Glaswand in das Kühlmedium[cite: 6, 7]. Dabei bildet sich im Inneren eine \textit{thermische Grenzschicht}: Bereits abgekühlte Flüssigkeit verbleibt an der Innenwand und wirkt aufgrund der geringen molekularen Wärmeleitung isolierend[cite: 20]. Dies verlangsamt den weiteren Wärmetransport aus dem warmen Flaschenkern erheblich.
 
 \subsection{Prinzip der erzwungenen Konvektion}
+Um diesen Effekt zu umgehen, nutzt der Prototyp das Prinzip der \textit{erzwungenen Konvektion}[cite: 19, 22]. Durch die kontinuierliche Rotation der Flasche wird das Bier aktiv durchmischt[cite: 15, 21].
+\begin{itemize}
+	\item \textbf{Durchmischung:} Die thermische Grenzschicht wird permanent zerstört[cite: 20].
+	\item \textbf{Wärmeübertragung:} Der Temperaturgradient an der Wand bleibt hoch, was den Wärmefluss beschleunigt[cite: 22].
+\end{itemize}
 
-Der entwickelte Bierkühler verhindert die Ausbildung der stabilen Grenzschicht, indem er das Bier kontinuierlich rotieren lässt. Durch diese Bewegung wird die Flüssigkeit dauerhaft durchgemischt.
-
-Dieser Prozess wird als \textit{erzwungene Konvektion} bezeichnet. Im Gegensatz zur natürlichen Konvektion wird die Strömung hier aktiv durch eine mechanische Kraft, wie in unserem Fall durch Motor, Welle und Steuerungseinheit in Form des Mikrocontrollers, erzeugt.
-
-Die Rotation sorgt für eine permanente Zerstörung der thermischen Grenzschicht und fördern den Transport vom warmen Bier zur Glaswand und vom kühlen Bier vom Rand ins innere.
 
 
-\subsection{Einflussfaktoren auf die Kühlleistung}
+\subsection{Einflussfaktoren auf die Systementwicklung}
+Die Effizienz des Systems wird durch verschiedene Parameter bestimmt, die über den Mikrocontroller geregelt werden[cite: 12, 18, 24]:
+\begin{itemize}
+	\item \textbf{Drehzahl:} Eine höhere Frequenz verbessert die Durchmischung, darf jedoch zur Vermeidung von Schaumbildung ein kritisches Maß nicht überschreiten[cite: 25].
+	\item \textbf{Kühlmedium:} Die Temperatur und Flussrate des Wassers über die Außenwand beeinflussen die Wärmeabfuhr maßgeblich[cite: 16, 26].
+	\item \textbf{Geometrie:} Materialeigenschaften und Wandstärke der Flasche setzen physikalische Grenzen für die Kühlgeschwindigkeit.
+\end{itemize}
 
-Die Effizienz des Systems hängt von der verwendeten Drehzahl der Rotation, der Temperatur des Kühlwassers, der Wassermenge die kühlt, dem Material, der Wandstärke der Flasche und der Anfangstemperatur des Bieres ab.
-
-Eine höhere Drehzahl verbessert die Durchmischung und erhöht den Wärmeübergangskoeffizienten. Allerdings muss die Drehzahl so gewählt werden, dass keine übermäßige Schaumbildung oder mechanische Belastung der Flasche entsteht, denn schäumendes Bier soll vermieden werden. Kühleres Wasser fördert die schnelle Kühlung, mehr Wasser fördert auch die schnelle Kühlung, ist der Wasserspiegel jedoch zu hoch, bringt die Kühlung wiederrum nichts, da die \textit{erzwungene Konvektion} bei zu viel Wasser nutzlos ist. Eine dickere Wand ist ebenso wie die Anfangstemperatur kontraproduktiv und verlangsamt die Kühlung.
-
-\subsection{Ableitung für die Systementwicklung}
-Zusammenfassend lässt sich festhalten, dass die theoretischen Grundlagen der Thermodynamik den direkten Rahmen für die technische Umsetzung vorgeben. Um die ideallen Bedingungen schaffen zu können muss unser Mikrocontroller die ECU's so anschließen, damit die Einflussfaktoren genau geregelt werden können. 
-Die physikalische Grenzen (wie die übermäßige Schaumbildung bei zu hoher Drehzahl) darf nicht überschritten werden. Aus diesen physikalischen Notwendigkeiten sowie dem praktischen Einsatzzweck des Geräts leiten sich unmittelbar die konkreten Hard- und Softwareanforderungen an den Prototyp ab, welche im folgenden Kapitel systematisch erfasst und definiert werden.
+\subsection{Ableitung der Anforderungen}
+Aus diesen physikalischen Notwendigkeiten ergeben sich die Anforderungen an den Prototyp[cite: 9, 10]. Der Mikrocontroller muss Motor und Wasserpumpe so steuern, dass die Kühlleistung unter Einhaltung mechanischer Grenzen (Vermeidung von Schlupf und Schaum) maximiert wird[cite: 13, 38].
